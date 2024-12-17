@@ -251,7 +251,7 @@
 						"typeHandlerVersion": "1.10",
 						"autoUpgradeMinorVersion": true,
 						"settings": {
-						"commandToExecute": "deploy.cmd"
+						"commandToExecute": "deploy.cmd && shutdown -r -f -t 0"
 						},
 						"protectedSettings": {
 						"fileUris": [
