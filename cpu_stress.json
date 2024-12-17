@@ -268,13 +268,17 @@
 		}
 	],
 	"outputs": {
-		"adminUsername": {
+		"vmNameOutput": {
+			"type": "string",
+			"value": "[variables('vmName')]"
+		},
+		"publicIpAddress": {
+			"type": "string",
+			"value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName')), '2023-05-01').properties.ipAddress]"
+		},
+		"adminUsernameOutput": {
 			"type": "string",
 			"value": "[parameters('adminUsername')]"
-		},
-		"publicIPAddress": {
-			"type": "string",
-			"value": "[reference(variables('publicIPAddressName')).ipAddress]"
 		}
 	}
 }
