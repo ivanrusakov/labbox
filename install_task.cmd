@@ -1,4 +1,4 @@
-REM @echo off
+@echo off
 rem This script installs files listed in a configuration file and creates/updates a scheduled task.
 
 setlocal enabledelayedexpansion
@@ -53,10 +53,32 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
-echo DBG "%CONFIG_PATH%"
 :: Process the configuration file if it exists
 if exist "%CONFIG_PATH%" (
     echo Reading files from configuration file "%CONFIG_FILE%"...
+    for /f "usebackq delims=" %%F in ("%CONFIG_PATH%") do (
+        set SRC_FILE=%%F
+        set FILE_SRC="%SCRIPT_DIR%!SRC_FILE!"
+        set FILE_DEST="%INSTALL_PATH%\%%F"
+
+        if /i "!SRC_FILE!"=="%SCRIPT_NAME%" (
+            echo Skipping duplicate entry: "!SRC_FILE!".
+            goto :continue
+        )
+
+        if not exist !FILE_SRC! (
+            echo Warning: File "!SRC_FILE!" not found in the source directory. Skipping...
+            goto :continue
+        )
+
+        echo Copying "!SRC_FILE!" to "%INSTALL_PATH%"...
+        copy /Y !FILE_SRC! !FILE_DEST! >nul
+        if %ERRORLEVEL% NEQ 0 (
+            echo Error: Failed to copy "!SRC_FILE!".
+            exit /b 1
+        )
+        :continue
+    )
 ) else (
     echo Warning: Configuration file "%CONFIG_FILE%" not found. Only main script is copied.
 )
