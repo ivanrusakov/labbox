@@ -2,7 +2,7 @@
 	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
 	"contentVersion": "1.0.0.0",
 	"metadata": {
-		"description": "CPU utilization will reach 100% on the VM shortlu after deployment, causing the container OS state to turn red in ASI (ContainerOsStateUnhealthy/ContainerOsStateUnresponsive).",
+		"description": "CPU utilization will reach 100% on the VM shortly after deployment, causing the container OS state to turn red in ASI (ContainerOsStateUnhealthy/ContainerOsStateUnresponsive).",
 		"author": "Ivan Rusakov",
 		"alias": "IvanRusakov",
 		"deploymentLinkInternal": "https://labboxprod.azurewebsites.net/api/Labbox?url=https://supportability.visualstudio.com/AzureIaaSVM/_git/Labbox?path=/SME/PERF/cpu_stress.json",
