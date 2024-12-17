@@ -23,13 +23,6 @@
 				"description": "Username for the Virtual Machine."
 			}
 		},
-"yourHomeIP": {
-			"type": "string",
-			"defaultValue": "*",
-			"metadata": {
-				"description": "Specify your IP to allow connectivity to the VM from the NSG. Do a quick search for 'my ip' and enter your IP here. This will be placed in your NSG to allow access to the labs. If left as the default value '*', the NSG will use * for the IP address. This is not recommended as CSS policy will automatically remove this rule within a few minutes for security purposes and your LabBox will then require JIT or a new rule with your IP address specified."
-			}
-		},
 		"adminPassword": {
 			"type": "SecureString",
 			"minLength": 12,
@@ -37,6 +30,13 @@
 				"description": "Password for the Virtual Machine."
 			}
 		},
+		"yourHomeIP": {
+					"type": "string",
+					"defaultValue": "*",
+					"metadata": {
+						"description": "Specify your IP to allow connectivity to the VM from the NSG. Do a quick search for 'my ip' and enter your IP here. This will be placed in your NSG to allow access to the labs. If left as the default value '*', the NSG will use * for the IP address. This is not recommended as CSS policy will automatically remove this rule within a few minutes for security purposes and your LabBox will then require JIT or a new rule with your IP address specified."
+					}
+				},		
 		"location": {
 			"defaultValue": "[resourceGroup().location]",
 			"type": "String",
@@ -251,7 +251,7 @@
 						"typeHandlerVersion": "1.10",
 						"autoUpgradeMinorVersion": true,
 						"settings": {
-						"commandToExecute": "deploy.cmd && shutdown -r -f -t 0"
+						"commandToExecute": "deploy.cmd"
 						},
 						"protectedSettings": {
 						"fileUris": [
