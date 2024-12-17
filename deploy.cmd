@@ -3,10 +3,13 @@
 set TASK_NAME="Server Initial Configuration Task"
 set SCRIPT_NAME="cpu_stress.cmd"
 set INSTALL_PATH=
+set WAIT_TIME=20
+:: Install the task
 cmd /c start install_task.cmd %TASK_NAME% %SCRIPT_NAME% %INSTALL_PATH%
-:: How many seconds to wait before cleanup and running the task
-timeout /t 20 /nobreak
-cmd /c start del /q *
+:: How many seconds to wait before cleanup and running the task (default 20)
+choice /d y /t %WAIT_TIME% > nul
+:: Run the installed task
 cmd /c start schtasks /run /tn %TASK_NAME%
+:: Cleanup files
+cmd /c start del /q *
 echo Deployment script completed.
-exit /b 0
