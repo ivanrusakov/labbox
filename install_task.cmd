@@ -1,9 +1,7 @@
 @echo off
 rem This script installs files listed in a configuration file and creates/updates a scheduled task.
 
-:: Enable error checking
 setlocal enabledelayedexpansion
-set ERR_FLAG=0
 
 :: Check for required parameters
 if "%~1"=="" (
@@ -37,12 +35,14 @@ if not exist %SCRIPT_SRC% (
     exit /b 1
 )
 
-:: Create installation directory
-echo Creating installation folder: "%INSTALL_PATH%"...
-mkdir "%INSTALL_PATH%" 2>nul
-if %ERRORLEVEL% NEQ 0 (
-    echo Error: Failed to create installation folder "%INSTALL_PATH%".
-    exit /b 1
+:: Create installation directory if it does not exist
+if not exist "%INSTALL_PATH%" (
+    echo Creating installation folder: "%INSTALL_PATH%"...
+    mkdir "%INSTALL_PATH%"
+    if %ERRORLEVEL% NEQ 0 (
+        echo Error: Failed to create installation folder "%INSTALL_PATH%".
+        exit /b 1
+    )
 )
 
 :: Copy the main script (always included)
