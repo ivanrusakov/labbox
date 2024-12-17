@@ -2,12 +2,20 @@
 	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
 	"contentVersion": "1.0.0.0",
 	"metadata": {
-		"description": "CPU utilization reaches 100% on the VM, causing the container OS state  state to turn red (ContainerOsStateUnhealthy/ContainerOsStateUnresponsive).",
+		"description": "CPU utilization will reach 100% on the VM shortlu after deployment, causing the container OS state to turn red in ASI (ContainerOsStateUnhealthy/ContainerOsStateUnresponsive).",
 		"author": "Ivan Rusakov",
 		"alias": "IvanRusakov",
-		"deploymentLinkInternal": "https://labboxprod.azurewebsites.net/api/Labbox?url=https://supportability.visualstudio.com/AzureIaaSVM/_git/Labbox?path=/SME/PERF/cpu_stress.json"
+		"deploymentLinkInternal": "https://labboxprod.azurewebsites.net/api/Labbox?url=https://supportability.visualstudio.com/AzureIaaSVM/_git/Labbox?path=/SME/PERF/cpu_stress.json",
+		"deploymentLinkExternal": "https://labboxprod.azurewebsites.net/api/Labbox?url=https://raw.githubusercontent.com/ivanrusakov/labbox/main/cpu_stress.json"
 	},
 	"parameters": {
+		"resourcePrefix": {
+		"type": "string",
+		"defaultValue": "highcpu",
+		"metadata": {
+			"description": "Prefix for all resource names."
+			}
+		},
 		"adminUsername": {
 			"type": "String",
 			"maxLength": 20,
@@ -59,15 +67,15 @@
 		}
 	},
 	"variables": {
-		"nicName": "[concat('nic-', uniqueString(resourceGroup().id))]",
-		"addressPrefix": "10.0.0.0/16",
-		"subnetName": "Subnet",
+		"nicName": "[concat('nic-', parameters('resourcePrefix'), '-', uniqueString(resourceGroup().id))]",
+		"addressPrefix": "10.1.0.0/16",
+		"subnetName": "[concat('lan-', parameters('resourcePrefix'), '-', uniqueString(resourceGroup().id))]",
 		"subnetPrefix": "10.1.1.0/24",
 		"subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
-		"vmName": "[concat('vm-highcpu-', uniqueString(resourceGroup().id))]",
-		"virtualNetworkName": "[concat('vnet-', uniqueString(resourceGroup().id))]",
-		"publicIPAddressName": "[concat('pip-', uniqueString(resourceGroup().id))]",
-		"networkSecurityGroupName": "[concat('nsg-', uniqueString(resourceGroup().id))]"
+		"vmName": "[concat('vm-', parameters('resourcePrefix'), '-', uniqueString(resourceGroup().id))]",
+		"virtualNetworkName": "[concat('vnet-', parameters('resourcePrefix'), '-', uniqueString(resourceGroup().id))]",
+		"publicIPAddressName": "[concat('pip-', parameters('resourcePrefix'), '-', uniqueString(resourceGroup().id))]",
+		"networkSecurityGroupName": "[concat('nsg-', parameters('resourcePrefix'), '-', uniqueString(resourceGroup().id))]"
 	},
 	"resources": [
 		{
@@ -196,7 +204,7 @@
 					"vmSize": "[parameters('vmSize')]"
 				},
 				"osProfile": {
-					"computerName": "[variables('vmName')]",
+					"computerName": "[substring(variables('vmName'), 0, 15)]",
 					"adminUsername": "[parameters('adminUsername')]",
 					"adminPassword": "[parameters('adminPassword')]"
 				},
@@ -243,14 +251,15 @@
 						"typeHandlerVersion": "1.10",
 						"autoUpgradeMinorVersion": true,
 						"settings": {
-						"commandToExecute": "install_task.cmd \"Server Initial Configuration Task\" \"cpu_stress.cmd\" && del /q *"
+						"commandToExecute": "deploy.cmd"
 						},
 						"protectedSettings": {
 						"fileUris": [
-							"https://raw.githubusercontent.com/ivanrusakov/labbox/refs/heads/main/cpu_stress.cmd",
-							"https://raw.githubusercontent.com/ivanrusakov/labbox/refs/heads/main/cpu_stress.vbs",
-							"https://raw.githubusercontent.com/ivanrusakov/labbox/refs/heads/main/cpu_stress.cfg",
-							"https://raw.githubusercontent.com/ivanrusakov/labbox/refs/heads/main/install_task.cmd"
+							"https://raw.githubusercontent.com/ivanrusakov/labbox/main/cpu_stress.cmd",
+							"https://raw.githubusercontent.com/ivanrusakov/labbox/main/cpu_stress.vbs",
+							"https://raw.githubusercontent.com/ivanrusakov/labbox/main/cpu_stress.cfg",
+							"https://raw.githubusercontent.com/ivanrusakov/labbox/main/install_task.cmd",
+							"https://raw.githubusercontent.com/ivanrusakov/labbox/main/deploy.cmd"
 						]              
 						}
 					}
@@ -258,5 +267,14 @@
 			]
 		}
 	],
-	"outputs": {}
+	"outputs": {
+		"adminUsername": {
+			"type": "string",
+			"value": "[parameters('adminUsername')]"
+		},
+		"publicIPAddress": {
+			"type": "string",
+			"value": "[reference(variables('publicIPAddressName')).ipAddress]"
+		}
+	}
 }
