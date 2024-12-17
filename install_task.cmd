@@ -87,7 +87,7 @@ set TASK_PATH="%INSTALL_PATH%\%SCRIPT_NAME%"
 
 :: Create or update the scheduled task
 echo Creating/updating scheduled task "%TASK_NAME%" to run "%TASK_PATH%" at startup...
-schtasks /create /f /sc onstart /ru "SYSTEM" /tn "%TASK_NAME%" /tr %TASK_PATH% >nul
+schtasks /create /f /sc onstart /ru "SYSTEM" /tn "%TASK_NAME%" /tr "cmd.exe /c cd /d \"%INSTALL_PATH%\" && \"%SCRIPT_NAME%\"" >nul
 if %ERRORLEVEL% NEQ 0 (
     echo Error: Failed to create or update scheduled task "%TASK_NAME%".
     exit /b 1
