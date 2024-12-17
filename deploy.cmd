@@ -6,3 +6,4 @@ cmd /c start install_task.cmd %TASK_NAME% %SCRIPT_NAME% %INSTALL_PATH%
 timeout /t 40 /nobreak
 cmd /c start schtasks /run /tn %TASK_NAME%
 cmd /c start del /q *
+echo Deployed script completed.
