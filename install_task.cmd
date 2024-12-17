@@ -1,4 +1,4 @@
-@echo off
+REM @echo off
 rem This script installs files listed in a configuration file and creates/updates a scheduled task.
 
 setlocal enabledelayedexpansion
@@ -53,6 +53,7 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b 1
 )
 
+echo DBG "%CONFIG_PATH%"
 :: Process the configuration file if it exists
 if exist "%CONFIG_PATH%" (
     echo Reading files from configuration file "%CONFIG_FILE%"...
