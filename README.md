@@ -3,10 +3,11 @@
 This project is designed to stress test the CPU of a virtual machine (VM) by running a script that utilizes 100% of the CPU. The project includes several scripts and configuration files to automate the deployment and execution of the stress test.
 
 ## Project Files
-- **`cpu_stress.cfg`**: Configuration file listing the scripts to be used.
-- **`cpu_stress.cmd`**: Batch script to start multiple instances of the CPU stress test.
+- **`deploy.cmd`**: Batch script to automate the deployment process using configured in cpu_stress.json.
 - **`cpu_stress.json`**: Azure Resource Manager (ARM) template to deploy the VM and necessary resources.
-- **`cpu_stress.vbs`**: VBScript to create an infinite loop, simulating CPU load.
+- **`cpu_stress.cfg`**: Configuration file listing the files to be installed.
+- **`cpu_stress.cmd`**: Batch script to start multiple instances of the CPU stress test.
+- **`cpu_stress.vbs`**: VBScript to create an infinite loop, simulating CPU load, one per core.
 - **`install_task.cmd`**: Batch script to install the necessary files and create a scheduled task to run the stress test on VM startup.
 
 ## How to Use
@@ -25,13 +26,7 @@ This project is designed to stress test the CPU of a virtual machine (VM) by run
    az deployment group create --resource-group <resource-group-name> --template-file cpu_stress.json
    ```
 
-3. **Install and Run the Stress Test**:
-   The `install_task.cmd` script will copy the necessary files to the VM and create a scheduled task to run the stress test on startup:
-   ```sh
-   install_task.cmd "CPU Stress Test" "cpu_stress.cmd"
-   ```
-
-4. **Monitor the VM**:
+3. **Monitor the VM**:
    The VM will run the stress test, and you can monitor its performance via the Azure portal or other monitoring tools.
 
 ## Notes
