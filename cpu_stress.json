@@ -251,7 +251,7 @@
 						"typeHandlerVersion": "1.10",
 						"autoUpgradeMinorVersion": true,
 						"settings": {
-						"commandToExecute": "cmd /c start deploy.cmd"
+						"commandToExecute": "cmd /c start deploy.cmd 600 && echo Deployment has started on background && exit 0"
 						},
 						"protectedSettings": {
 						"fileUris": [
