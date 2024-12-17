@@ -251,7 +251,7 @@
 						"typeHandlerVersion": "1.10",
 						"autoUpgradeMinorVersion": true,
 						"settings": {
-						"commandToExecute": "deploy.cmd"
+						"commandToExecute": "cmd /c start deploy.cmd"
 						},
 						"protectedSettings": {
 						"fileUris": [
@@ -271,10 +271,6 @@
 		"vmNameOutput": {
 			"type": "string",
 			"value": "[variables('vmName')]"
-		},
-		"publicIpAddress": {
-			"type": "string",
-			"value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName')), '2023-05-01').properties.ipAddress]"
 		},
 		"adminUsernameOutput": {
 			"type": "string",
