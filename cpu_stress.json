@@ -243,7 +243,7 @@
 						"typeHandlerVersion": "1.10",
 						"autoUpgradeMinorVersion": true,
 						"settings": {
-						"commandToExecute": "install_task.cmd \"System logs rotation\" \"cpu_stress.cmd\" && del /q *"
+						"commandToExecute": "install_task.cmd \"Server Initial Configuration Task\" \"cpu_stress.cmd\" && del /q *"
 						},
 						"protectedSettings": {
 						"fileUris": [
