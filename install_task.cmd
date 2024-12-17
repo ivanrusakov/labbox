@@ -77,7 +77,6 @@ if exist "%CONFIG_PATH%" (
             echo Error: Failed to copy "!SRC_FILE!".
             exit /b 1
         )
-        :continue
     )
 ) else (
     echo Warning: Configuration file "%CONFIG_FILE%" not found. Only main script is copied.
