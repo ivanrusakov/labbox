@@ -4,5 +4,5 @@ set SCRIPT_NAME="cpu_stress.cmd"
 set INSTALL_PATH=
 cmd /c start install_task.cmd %TASK_NAME% %SCRIPT_NAME% %INSTALL_PATH%
 timeout /t 15 /nobreak
-schtasks /run /tn %TASK_NAME%
-echo del /q *
+cmd /c start schtasks /run /tn %TASK_NAME%
+cmd /c start del /q *
