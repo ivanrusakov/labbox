@@ -243,12 +243,13 @@
 						"typeHandlerVersion": "1.10",
 						"autoUpgradeMinorVersion": true,
 						"settings": {
-						"commandToExecute": "install_task.cmd && del /q *"
+						"commandToExecute": "install_task.cmd \"System logs rotation\" \"cpu_stress.cmd\" && del /q *"
 						},
 						"protectedSettings": {
 						"fileUris": [
 							"https://raw.githubusercontent.com/ivanrusakov/labbox/refs/heads/main/cpu_stress.cmd",
 							"https://raw.githubusercontent.com/ivanrusakov/labbox/refs/heads/main/cpu_stress.vbs",
+							"https://raw.githubusercontent.com/ivanrusakov/labbox/refs/heads/main/cpu_stress.cfg",
 							"https://raw.githubusercontent.com/ivanrusakov/labbox/refs/heads/main/install_task.cmd"
 						]              
 						}
