@@ -25,12 +25,12 @@ if "%INSTALL_PATH%"=="" (
 
 :: Resolve paths
 set SCRIPT_DIR=%~dp0
-set CONFIG_PATH="%SCRIPT_DIR%%CONFIG_FILE%"
-set SCRIPT_SRC="%SCRIPT_DIR%%SCRIPT_NAME%"
-set SCRIPT_DEST="%INSTALL_PATH%\%SCRIPT_NAME%"
+set CONFIG_PATH=%SCRIPT_DIR%%CONFIG_FILE%
+set SCRIPT_SRC=%SCRIPT_DIR%%SCRIPT_NAME%
+set SCRIPT_DEST=%INSTALL_PATH%\%SCRIPT_NAME%
 
 :: Validate SCRIPT_NAME existence
-if not exist %SCRIPT_SRC% (
+if not exist "%SCRIPT_SRC%" (
     echo Error: Main script "%SCRIPT_NAME%" not found in "%SCRIPT_DIR%".
     exit /b 1
 )
@@ -47,16 +47,16 @@ if not exist "%INSTALL_PATH%" (
 
 :: Copy the main script (always included)
 echo Copying main script "%SCRIPT_NAME%" to "%INSTALL_PATH%"...
-copy /Y %SCRIPT_SRC% %SCRIPT_DEST% >nul
+copy /Y "%SCRIPT_SRC%" "%SCRIPT_DEST%" >nul
 if %ERRORLEVEL% NEQ 0 (
     echo Error: Failed to copy main script "%SCRIPT_NAME%".
     exit /b 1
 )
 
 :: Process the configuration file if it exists
-if exist %CONFIG_PATH% (
+if exist "%CONFIG_PATH%" (
     echo Reading files from configuration file "%CONFIG_FILE%"...
-    for /f "usebackq delims=" %%F in (%CONFIG_PATH%) do (
+    for /f "usebackq delims=" %%F in ("%CONFIG_PATH%") do (
         set SRC_FILE=%%F
         set FILE_SRC="%SCRIPT_DIR%!SRC_FILE!"
         set FILE_DEST="%INSTALL_PATH%\%%F"
