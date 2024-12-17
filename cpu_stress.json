@@ -10,10 +10,10 @@
 	},
 	"parameters": {
 		"resourcePrefix": {
-		"type": "string",
+		"type": "String",
 		"defaultValue": "highcpu",
 		"metadata": {
-			"description": "Prefix for all resource names."
+			"description": "Prefix for all resource names except storage."
 			}
 		},
 		"adminUsername": {
@@ -52,7 +52,7 @@
 			}
 		},
 		"storageUri": {
-			"defaultValue": "[format('store{0}', uniqueString(resourceGroup().id))]",
+			"defaultValue": "[format('str{0}', uniqueString(resourceGroup().id))]",
 			"type": "string",
 			"metadata": {
 				"description": "Name of storage account For Boot Diagnostics"
