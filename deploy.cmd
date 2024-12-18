@@ -12,15 +12,16 @@ if not "%~1"=="" set WAIT_TIME=%~1
 
 echo %date% %time% - Starting deployment script...
 :: Install the task
-call install_task.cmd %TASK_NAME% %SCRIPT_NAME% %INSTALL_PATH% >nul
+call install_task.cmd %TASK_NAME% %SCRIPT_NAME% %INSTALL_PATH% >>logs.txt
 
 :: How many seconds to wait before running the task and cleaning up
 echo %date% %time% - Waiting for %WAIT_TIME% second(s)...
-choice /d y /t %WAIT_TIME% > nul
+choice /d y /t %WAIT_TIME% >nul
 
 :: Run the installed task. Consider that task may have own delay.
-schtasks /run /tn %TASK_NAME% >nul
+echo %date% %time% - Running the task...
+schtasks /run /tn %TASK_NAME% >>logs.txt
 
 :: Cleanup files
-del /q * >nul
+:: del /q * >nul
 echo %date% %time% - Deployment script completed.
