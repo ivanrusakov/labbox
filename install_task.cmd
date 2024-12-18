@@ -100,4 +100,3 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 echo Installation and task setup complete.
-exit /b 0

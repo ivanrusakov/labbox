@@ -25,4 +25,3 @@ for /L %%a in (1,1,%CPUs%) do (
 
 echo All CPU stress loops started.
 endlocal
-exit /b 0
