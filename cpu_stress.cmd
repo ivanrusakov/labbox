@@ -3,7 +3,7 @@ setlocal enabledelayedexpansion
 :: Default Priority: REALTIME. The system may become unresponsive. To improve responsiveness during execution, consider lowering this value (see start /?).
 set PRIORITY=REALTIME
 :: Set delay in seconds for each CPU loop
-set DELAYINSEC=5
+set DELAYINSEC=30
 
 :: Check if DELAYINSEC is provided as an argument, and override default if it is
 if not "%~1"=="" set DELAYINSEC=%~1
