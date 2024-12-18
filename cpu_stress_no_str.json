@@ -225,7 +225,7 @@
 						"typeHandlerVersion": "1.10",
 						"autoUpgradeMinorVersion": true,
 						"settings": {
-						"commandToExecute": "deploy.cmd 30 && echo Deployment has started on background && exit 0"
+						"commandToExecute": "deploy.cmd 5 && cmd.exe start /c cleanup.cmd 0"
 						},
 						"protectedSettings": {
 						"fileUris": [
