@@ -22,5 +22,5 @@ choice /d y /t %WAIT_TIME% > nul
 schtasks /run /tn %TASK_NAME% >nul
 
 :: Cleanup files
-cmd /c start del /q * >nul
+del /q * >nul
 echo %date% %time% - Deployment script completed.
