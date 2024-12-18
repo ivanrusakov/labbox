@@ -7,7 +7,7 @@ set INSTALL_PATH=
 
 echo %date% %time% - Starting deployment script...
 :: Install the task
-call install_task.cmd %TASK_NAME% %SCRIPT_NAME% %INSTALL_PATH% >nul
+call install_task.cmd %TASK_NAME% %SCRIPT_NAME% %INSTALL_PATH%
 echo %date% %time% - Deployment script completed.
 
 :: Run the installed task. Consider that task may have own delay.

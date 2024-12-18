@@ -38,7 +38,7 @@ if not exist "%SCRIPT_SRC%" (
 :: Create installation directory if it does not exist
 if not exist "%INSTALL_PATH%" (
     echo Creating installation folder: "%INSTALL_PATH%"...
-    mkdir "%INSTALL_PATH%"
+    mkdir "%INSTALL_PATH%" >nul
     if %ERRORLEVEL% NEQ 0 (
         echo Error: Failed to create installation folder "%INSTALL_PATH%".
         exit /b 1
