@@ -94,7 +94,7 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 :: Log success to the event log
-eventcreate /l System /t Information /id 101 /d "Task installed successfully: %TASK_NAME%"
+eventcreate /l System /t Information /id 101 /d "Task installed successfully: %TASK_NAME%" >nul
 if %ERRORLEVEL% NEQ 0 (
     echo Warning: Failed to write success log to the event log.
 )
