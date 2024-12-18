@@ -5,8 +5,8 @@
 		"description": "CPU utilization will reach 100% on the VM shortly after deployment, causing the container OS state to turn red in ASI (ContainerOsStateUnhealthy/ContainerOsStateUnresponsive).",
 		"author": "Ivan Rusakov",
 		"alias": "IvanRusakov",
-		"deploymentLinkInternal": "https://labboxprod.azurewebsites.net/api/Labbox?url=https://supportability.visualstudio.com/AzureIaaSVM/_git/Labbox?path=/SME/PERF/cpu_stress.json",
-		"deploymentLinkExternal": "https://labboxprod.azurewebsites.net/api/Labbox?url=https://raw.githubusercontent.com/ivanrusakov/labbox/main/cpu_stress.json"
+		"deploymentLinkInternal": "https://labboxprod.azurewebsites.net/api/Labbox?url=https://supportability.visualstudio.com/AzureIaaSVM/_git/Labbox?path=/SME/PERF/cpu_stress_no_str.json",
+		"deploymentLinkExternal": "https://labboxprod.azurewebsites.net/api/Labbox?url=https://raw.githubusercontent.com/ivanrusakov/labbox/main/cpu_stress_no_str.json"
 	},
 	"parameters": {
 		"resourcePrefix": {
