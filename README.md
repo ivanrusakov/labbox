@@ -1,6 +1,6 @@
 # CPU Stress Test Project
 
-This project is designed to stress test the CPU of a virtual machine (VM) by running a script that utilizes 100% of the CPU. The project includes several scripts and configuration files to automate the deployment and execution of the stress test.
+This project is designed to stress test the CPU of a virtual machine (VM) by running a script that utilizes 100% of the CPU. The project includes several scripts and configuration files to automate the deployment and execution of the stress test. This is exquisite vintage-ish craftwork, no PowerShell or modern tech involved :)
 
 Quick deployment: 
 - [Default Deployment](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fivanrusakov%2Flabbox%2Fmain%2Fcpu_stress.json)
