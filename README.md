@@ -37,3 +37,7 @@ Quick deployment:
 - Ensure you have the necessary permissions to deploy resources in your Azure subscription.
 - Modify the `cpu_stress.json` template parameters as needed for your environment.
 - The stress test will utilize 100% of the CPU, which may impact the responsiveness of the VM. Adjust the priority in `cpu_stress.cmd` if needed.
+
+#TODO
+- Make install_task useful for schedulled tasks
+- Hide output with nul in ARM template
