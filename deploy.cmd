@@ -20,7 +20,7 @@ if not "%~5"=="" set START_TASK_NAME=%~5
 echo %date% %time% - Starting deployment script...
 
 :: Install the main task
-call install_task.cmd %TASK_NAME% %SCRIPT_NAME% %INSTALL_PATH%
+call install_task.cmd "%TASK_NAME%" "%SCRIPT_NAME%" "%INSTALL_PATH%"
 echo %date% %time% - Main task installation completed.
 
 :: Create a secondary task to start the main task after a delay
