@@ -5,16 +5,6 @@ Function IsNumericValue(str)
     IsNumericValue = IsNumeric(str)
 End Function
 
-' Function to format a Date object into ISO 8601 UTC-like string
-Function FormatToUTCString(dt)
-    FormatToUTCString = Year(dt) & "-" & _
-                        Right("00" & Month(dt), 2) & "-" & _
-                        Right("00" & Day(dt), 2) & "T" & _
-                        Right("00" & Hour(dt), 2) & ":" & _
-                        Right("00" & Minute(dt), 2) & ":" & _
-                        Right("00" & Second(dt), 2) & "Z"
-End Function
-
 ' Function to retrieve a specific part of the date or time
 Function GetDateTimePart(dt, part)
     Select Case LCase(part)
