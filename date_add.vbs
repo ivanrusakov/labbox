@@ -19,7 +19,7 @@ Function GetDateTimePart(dateTime, partType, timeFormat)
                                     Right("00" & Minute(dateTime), 2) & ":" & _
                                     Right("00" & Second(dateTime), 2)
                 Case "both"
-                    GetDateTimePart = GetDateTimePart(dateTime, "date") & "T" & GetDateTimePart(dateTime, "time")
+                    GetDateTimePart = GetDateTimePart(dateTime, "date", timeFormat) & "T" & GetDateTimePart(dateTime, "time", timeFormat)
                 Case Else
                     GetDateTimePart = ""
                 End Select
@@ -35,8 +35,7 @@ Function GetDateTimePart(dateTime, partType, timeFormat)
                     GetDateTimePart = ""
             End Select
             
-    End Select  
-    
+    End Select
 End Function
 
 Dim currentDate, secondsToAdd, newDate, outputType, outputValue, timeFormat
