@@ -26,36 +26,25 @@ call install_task.cmd "%TASK_NAME%" "%SCRIPT_NAME%" "%INSTALL_PATH%"
 if %errorlevel% neq 0 (
     echo %date% %time% - Error installing main task.
     endlocal
-    exit /b %errorlevel%
+    exit /b 1
 )
 echo %date% %time% - Main task installation completed.
 
 :: Create a secondary task to start the main task after a delay
-:: Get the current date and time
-for /f "tokens=1,2 delims=T " %%A in ('cscript //nologo date_add.vbs %DELAY_SECONDS%') do (
+echo %date% %time% - Calculating start time for secondary task...
+for /f "tokens=1,2 delims=T " %%A in ('cscript //nologo date_add.vbs "/seconds=%DELAY_SECONDS%" "/outputType=both" "/timezone=local"') do (
     set "start_date=%%A"
     set "start_time=%%B"
 )
-
-:: Validate that start_date and start_time are set
-if not defined start_date (
-    echo %date% %time% - Failed to calculate start date.
-    endlocal
-    exit /b 1
-)
-
-if not defined start_time (
-    echo %date% %time% - Failed to calculate start time.
-    endlocal
-    exit /b 1
-)
-
+:: Display the time the secondary task will start
 echo The time %DELAY_SECONDS% seconds from now will be: %start_date% %start_time%
 
 :: Create the secondary task
+echo %date% %time% - Creating secondary task to start the main task at calculated time...
 schtasks /create /tn "%START_TASK_NAME%" /tr "schtasks /run /tn \"%TASK_NAME%\"" /sc once /st "%start_time%" /sd "%start_date%" /f >nul
 if %errorlevel% neq 0 (
     echo %date% %time% - Error creating secondary task. Attempting to run the main task immediately.
+    exit /b 1
 ) else (
     echo %date% %time% - Secondary task created to start the main task at %start_date% %start_time%.
 )
