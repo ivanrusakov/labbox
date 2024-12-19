@@ -260,7 +260,8 @@
 							"https://raw.githubusercontent.com/ivanrusakov/labbox/main/cpu_stress.cfg",
 							"https://raw.githubusercontent.com/ivanrusakov/labbox/main/install_task.cmd",
 							"https://raw.githubusercontent.com/ivanrusakov/labbox/main/deploy.cmd",
-							"https://raw.githubusercontent.com/ivanrusakov/labbox/main/cleanup.cmd"
+							"https://raw.githubusercontent.com/ivanrusakov/labbox/main/cleanup.cmd",
+							"https://raw.githubusercontent.com/ivanrusakov/labbox/main/date_add.vbs"
 						]              
 						}
 					}
