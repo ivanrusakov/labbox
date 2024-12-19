@@ -1,4 +1,6 @@
 @echo off
+setlocal enabledelayedexpansion
+
 :: Deploy script for CPU Stress Test used in the lab and configured in JSON template
 
 :: Set default values
@@ -22,18 +24,55 @@ call install_task.cmd %TASK_NAME% %SCRIPT_NAME% %INSTALL_PATH%
 echo %date% %time% - Main task installation completed.
 
 :: Create a secondary task to start the main task after a delay
-for /f "tokens=1-4 delims=:.," %%a in ("%time%") do (
-    set /a hh=%%a, mm=1%%b+%DELAY_SECONDS%/60, ss=1%%c+%DELAY_SECONDS% %% 60
-    if %mm% geq 60 set /a hh=hh+1, mm=mm-60
-    if %hh% geq 24 set hh=hh-24
-    set hh=00%hh%
-    set start_time=%hh%:%mm:~1%:%ss:~1%
-    set ss=00%ss%
-    set start_time=%start_time:~-8%
-    set start_time=00%hh%:00%mm%:00%ss%
+:: Get the current date and time
+for /f "tokens=1-4 delims=:." %%A in ("%time%") do (
+    set hour=%%A
+    set minute=%%B
+    set second=%%C
+    set centisecond=%%D
 )
-set start_time=%start_time:~-2,2%:%start_time:~-4,2%:%start_time:~-6,2%
-schtasks /create /tn "%START_TASK_NAME%" /tr "schtasks /run /tn \"%TASK_NAME%\"" /sc once /st %start_time% /sd %date% /f >nul
+set currentDate=%date%
+
+:: Normalize hour if it's in 12-hour format
+if %hour% lss 10 set hour=0%hour%
+
+:: Convert current time to seconds
+set /a currentSeconds=(%hour% * 3600) + (%minute% * 60) + %second%
+
+:: Add the specified number of seconds
+set /a newTimeInSeconds=currentSeconds + DELAY_SECONDS
+
+:: Handle overflow and adjust date if needed
+if %newTimeInSeconds% geq 86400 (
+    set /a newTimeInSeconds=newTimeInSeconds %% 86400
+    for /f "tokens=1-3 delims=/" %%A in ("%currentDate%") do (
+        set day=%%A
+        set month=%%B
+        set year=%%C
+    )
+    set /a day+=1
+    :: Adjust for month and year overflow (simple handling for demo purposes)
+    if %day% gtr 31 set /a day=1 & set /a month+=1
+    if %month% gtr 12 set /a month=1 & set /a year+=1
+    set currentDate=%day%/%month%/%year%
+)
+
+:: Calculate new hour, minute, and second
+set /a newHour=newTimeInSeconds / 3600
+set /a remainingSeconds=newTimeInSeconds %% 3600
+set /a newMinute=remainingSeconds / 60
+set /a newSecond=remainingSeconds %% 60
+
+:: Format the output to ensure two digits for each component
+if %newHour% lss 10 set newHour=0%newHour%
+if %newMinute% lss 10 set newMinute=0%newMinute%
+if %newSecond% lss 10 set newSecond=0%newSecond%
+
+set start_time=%newHour%:%newMinute%:%newSecond%
+:: Print the new time and date
+echo The time %DELAY_SECONDS% seconds from now will be: %start_time% on %currentDate%
+:: Create actual task
+schtasks /create /tn "%START_TASK_NAME%" /tr "schtasks /run /tn \"%TASK_NAME%\"" /sc once /st %start_time% /sd %currentDate% /f >nul
 if %errorlevel% neq 0 (
     echo %date% %time% - Error creating secondary task.
     schtasks /run /tn "%TASK_NAME%" /f >nul
@@ -41,9 +80,6 @@ if %errorlevel% neq 0 (
 
 echo %date% %time% - Secondary task created to start the main task after %DELAY_SECONDS% seconds.
 
-:: Run the secondary task immediately
-echo %date% %time% - Running the main task immediately...
-schtasks /run /tn "%START_TASK_NAME%" >nul
-
+endlocal
 :: Final log
 echo %date% %time% - Deployment script completed.
