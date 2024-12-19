@@ -32,7 +32,7 @@ echo %date% %time% - Main task installation completed.
 
 :: Create a secondary task to start the main task after a delay
 echo %date% %time% - Calculating start time for secondary task...
-for /f "tokens=1,2 delims=T " %%A in ('cscript //nologo date_add.vbs "/seconds=%DELAY_SECONDS%" "/outputType=both" "/timezone=local"') do (
+for /f "tokens=1,2 delims=T " %%A in ('cscript //nologo date_add.vbs "/seconds=%DELAY_SECONDS%" "/outputType=both" "/timeFormat=local"') do (
     set "start_date=%%A"
     set "start_time=%%B"
 )

@@ -72,7 +72,7 @@ Function ParseAndValidateArgs()
                     If value = "date" Or value = "time" Or value = "both" Then
                         outputType = value
                     Else
-                        WScript.Echo "Error: /outputType must be 'date', 'time', or 'both'."
+                        WScript.Echo "Error: /outputType must be 'date', 'time', or 'both'. Default is " & outputType & "."
                         WScript.Quit 1
                     End If
                 Case "/timeformat"
@@ -80,7 +80,7 @@ Function ParseAndValidateArgs()
                     If value = "utc" Or value = "local" Then
                         timeFormat = value
                     Else
-                        WScript.Echo "Error: /timeFormat must be 'UTC' or 'local'."
+                        WScript.Echo "Error: /timeFormat must be 'UTC' or 'local'. Default is " & timeFormat & "."
                         WScript.Quit 1
                     End If
                 Case Else
