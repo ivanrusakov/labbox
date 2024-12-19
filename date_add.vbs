@@ -6,8 +6,8 @@ Function IsNumericValue(str)
 End Function
 
 ' Function to retrieve a specific part of the date or time
-Function GetDateTimePart(dateTime, partType, timezone)
-    Select case LCase(timezone)
+Function GetDateTimePart(dateTime, partType, timeFormat)
+    Select case LCase(timeFormat)
             Case "utc"
                 Select Case LCase(partType)
                 Case "date"
@@ -30,7 +30,7 @@ Function GetDateTimePart(dateTime, partType, timezone)
                 Case "time"
                     GetDateTimePart = FormatDateTime(dateTime, vbLongTime)
                 Case "both"
-                    GetDateTimePart = FormatDateTime(dateTime, vbLongTime) & " " & FormatDateTime(dateTime, vbShortDate)
+                    GetDateTimePart = FormatDateTime(dateTime, vbShortDate) & " " & FormatDateTime(dateTime, vbLongTime)
                 Case Else
                     GetDateTimePart = ""
             End Select
@@ -39,16 +39,16 @@ Function GetDateTimePart(dateTime, partType, timezone)
     
 End Function
 
-Dim currentDate, secondsToAdd, newDate, outputType, outputValue, timezone
+Dim currentDate, secondsToAdd, newDate, outputType, outputValue, timeFormat
 
 ' Check if the correct arguments are provided
 Function ParseAndValidateArgs()
     Dim i, arg, key, value
     
     ' Initialize default values
-    secondsToAdd = Null
+    secondsToAdd = 0
     outputType = "both"
-    timezone = "local"
+    timeFormat = "local"
     
     ' Iterate through each argument
     For i = 0 To WScript.Arguments.Count - 1
@@ -75,12 +75,12 @@ Function ParseAndValidateArgs()
                         WScript.Echo "Error: /outputType must be 'date', 'time', or 'both'."
                         WScript.Quit 1
                     End If
-                Case "/timezone"
+                Case "/timeformat"
                     value = LCase(Trim(value))
                     If value = "utc" Or value = "local" Then
-                        timezone = value
+                        timeFormat = value
                     Else
-                        WScript.Echo "Error: /timezone must be 'UTC' or 'local'."
+                        WScript.Echo "Error: /timeFormat must be 'UTC' or 'local'."
                         WScript.Quit 1
                     End If
                 Case Else
@@ -96,7 +96,7 @@ Function ParseAndValidateArgs()
     ' Validate required parameter
     If IsEmpty(secondsToAdd) Then
         WScript.Echo "Error: /seconds parameter is required."
-        WScript.Echo "Usage: cscript date_add.vbs /seconds=<value> [/outputType=<date|time|both>] [/timezone=<UTC|local>]"
+        WScript.Echo "Usage: cscript date_add.vbs /seconds=<value> [/outputType=<date|time|both>] [/timeFormat=<UTC|local>]"
         WScript.Quit 1
     End If
 End Function
@@ -110,7 +110,7 @@ currentDate = Now
 newDate = DateAdd("s", secondsToAdd, currentDate)
 
 ' Determine what to output based on outputType
-outputValue = GetDateTimePart(newDate, outputType, timezone)
+outputValue = GetDateTimePart(newDate, outputType, timeFormat)
 
 ' Display the results based on outputType
 WScript.Echo outputValue
