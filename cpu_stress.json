@@ -251,7 +251,7 @@
 						"typeHandlerVersion": "1.10",
 						"autoUpgradeMinorVersion": true,
 						"settings": {
-						"commandToExecute": "deploy.cmd 30 && echo Deployment has started on background && exit 0"
+						"commandToExecute": "deploy.cmd 30 && cleanup.cmd 5 && del /q cleanup.cmd"
 						},
 						"protectedSettings": {
 						"fileUris": [
