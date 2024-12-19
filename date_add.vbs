@@ -6,72 +6,111 @@ Function IsNumericValue(str)
 End Function
 
 ' Function to retrieve a specific part of the date or time
-Function GetDateTimePart(dt, part)
-    Select Case LCase(part)
-        Case "date"
-            GetDateTimePart = Year(dt) & "-" & _
-                              Right("00" & Month(dt), 2) & "-" & _
-                              Right("00" & Day(dt), 2)
-        Case "time"
-            GetDateTimePart = Right("00" & Hour(dt), 2) & ":" & _
-                              Right("00" & Minute(dt), 2) & ":" & _
-                              Right("00" & Second(dt), 2)
-        Case "both"
-            GetDateTimePart = GetDateTimePart(dt, "date") & "T" & GetDateTimePart(dt, "time")
-        Case Else
-            GetDateTimePart = ""
-    End Select
+Function GetDateTimePart(dateTime, partType, timezone)
+    Select case LCase(timezone)
+            Case "utc"
+                Select Case LCase(partType)
+                Case "date"
+                    GetDateTimePart = Year(dateTime) & "-" & _
+                                    Right("00" & Month(dateTime), 2) & "-" & _
+                                    Right("00" & Day(dateTime), 2)
+                Case "time"
+                    GetDateTimePart = Right("00" & Hour(dateTime), 2) & ":" & _
+                                    Right("00" & Minute(dateTime), 2) & ":" & _
+                                    Right("00" & Second(dateTime), 2)
+                Case "both"
+                    GetDateTimePart = GetDateTimePart(dateTime, "date") & "T" & GetDateTimePart(dateTime, "time")
+                Case Else
+                    GetDateTimePart = ""
+                End Select
+        Case "local"            
+            Select Case LCase(partType)
+                Case "date"
+                    GetDateTimePart = FormatDateTime(dateTime, vbShortDate)
+                Case "time"
+                    GetDateTimePart = FormatDateTime(dateTime, vbLongTime)
+                Case "both"
+                    GetDateTimePart = FormatDateTime(dateTime, vbLongTime) & " " & FormatDateTime(dateTime, vbShortDate)
+                Case Else
+                    GetDateTimePart = ""
+            End Select
+            
+    End Select  
+    
 End Function
 
-Dim currentDate, secondsToAdd, newDate, outputType, outputValue
+Dim currentDate, secondsToAdd, newDate, outputType, outputValue, timezone
 
-' Check if the correct number of arguments is provided (1 or 2)
-If WScript.Arguments.Count < 1 Or WScript.Arguments.Count > 2 Then
-    WScript.Echo "Usage: cscript date_add.vbs <secondsToAdd> [outputType]"
-    WScript.Echo "       <secondsToAdd> : Numeric value representing seconds to add."
-    WScript.Echo "       [outputType]   : Optional. Specify 'date', 'time', or 'both'. Default is 'both'."
-    WScript.Quit 1
-End If
-
-' Get the number of seconds to add from the first command-line argument
-If IsNumericValue(WScript.Arguments(0)) Then
-    secondsToAdd = CLng(WScript.Arguments(0))
-Else
-    WScript.Echo "Error: The first argument must be a numeric value representing seconds."
-    WScript.Quit 1
-End If
-
-' Determine the output type from the second command-line argument, if provided
-If WScript.Arguments.Count = 2 Then
-    outputType = LCase(Trim(WScript.Arguments(1)))
-    If outputType <> "date" And outputType <> "time" And outputType <> "both" Then
-        WScript.Echo "Error: The second argument must be 'date', 'time', or 'both'."
+' Check if the correct arguments are provided
+Function ParseAndValidateArgs()
+    Dim i, arg, key, value
+    
+    ' Initialize default values
+    secondsToAdd = Null
+    outputType = "both"
+    timezone = "local"
+    
+    ' Iterate through each argument
+    For i = 0 To WScript.Arguments.Count - 1
+        arg = WScript.Arguments(i)
+        
+        ' Check if argument contains '='
+        If InStr(arg, "=") > 0 Then
+            key = LCase(Left(arg, InStr(arg, "=") - 1))
+            value = Mid(arg, InStr(arg, "=") + 1)
+            
+            Select Case key
+                Case "/seconds"
+                    If IsNumericValue(value) Then
+                        secondsToAdd = CLng(value)
+                    Else
+                        WScript.Echo "Error: /seconds must be a numeric value."
+                        WScript.Quit 1
+                    End If
+                Case "/outputtype"
+                    value = LCase(Trim(value))
+                    If value = "date" Or value = "time" Or value = "both" Then
+                        outputType = value
+                    Else
+                        WScript.Echo "Error: /outputType must be 'date', 'time', or 'both'."
+                        WScript.Quit 1
+                    End If
+                Case "/timezone"
+                    value = LCase(Trim(value))
+                    If value = "utc" Or value = "local" Then
+                        timezone = value
+                    Else
+                        WScript.Echo "Error: /timezone must be 'UTC' or 'local'."
+                        WScript.Quit 1
+                    End If
+                Case Else
+                    WScript.Echo "Error: Unknown parameter '" & key & "'."
+                    WScript.Quit 1
+            End Select
+        Else
+            WScript.Echo "Error: Invalid parameter format '" & arg & "'. Expected /key=value."
+            WScript.Quit 1
+        End If
+    Next
+    
+    ' Validate required parameter
+    If IsEmpty(secondsToAdd) Then
+        WScript.Echo "Error: /seconds parameter is required."
+        WScript.Echo "Usage: cscript date_add.vbs /seconds=<value> [/outputType=<date|time|both>] [/timezone=<UTC|local>]"
         WScript.Quit 1
     End If
-Else
-    outputType = "both" ' Default value
-End If
+End Function
+
+ParseAndValidateArgs
 
 ' Get the current date and time
 currentDate = Now
 
-' Ensure currentDate is a Date type
-If Not IsDate(currentDate) Then
-    WScript.Echo "Error: Unable to retrieve the current date and time."
-    WScript.Quit 1
-End If
-
 ' Add the seconds to the current date and time
-On Error Resume Next
 newDate = DateAdd("s", secondsToAdd, currentDate)
-If Err.Number <> 0 Then
-    WScript.Echo "Error adding seconds: " & Err.Description
-    WScript.Quit 1
-End If
-On Error GoTo 0
 
 ' Determine what to output based on outputType
-outputValue = GetDateTimePart(newDate, outputType)
+outputValue = GetDateTimePart(newDate, outputType, timezone)
 
 ' Display the results based on outputType
 WScript.Echo outputValue
