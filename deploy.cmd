@@ -22,28 +22,22 @@ call install_task.cmd %TASK_NAME% %SCRIPT_NAME% %INSTALL_PATH%
 echo %date% %time% - Main task installation completed.
 
 :: Create a secondary task to start the main task after a delay
-for /f "tokens=1-4 delims=:.," %%a in ("%time%") do (
-    set /a hh=%%a, mm=1%%b+%DELAY_SECONDS%/60, ss=1%%c+%DELAY_SECONDS% %% 60
-    if %mm% geq 60 set /a hh=hh+1, mm=mm-60
-    if %hh% geq 24 set hh=hh-24
-    set hh=00%hh%
-    set start_time=%hh%:%mm:~1%:%ss:~1%
-    set ss=00%ss%
-    set start_time=%start_time:~-8%
-    set start_time=00%hh%:00%mm%:00%ss%
+:: Get the current date and time
+for /f "tokens=1,2 delims= " %%A in ('cscript //nologo date_add.vbs %DELAY_SECONDS%') do (
+    set "start_date=%%A"
+    set "start_time=%%B"
 )
-set start_time=%start_time:~-2,2%:%start_time:~-4,2%:%start_time:~-6,2%
-schtasks /create /tn "%START_TASK_NAME%" /tr "schtasks /run /tn \"%TASK_NAME%\"" /sc once /st %start_time% /sd %date% /f >nul
+:: Print the new time and date
+echo The time %DELAY_SECONDS% seconds from now will be: %start_date% %start_time%
+
+:: Create the secondary task
+schtasks /create /tn "%START_TASK_NAME%" /tr "schtasks /run /tn \"%TASK_NAME%\"" /sc once /st %start_time% /sd %start_date% /f >nul
 if %errorlevel% neq 0 (
     echo %date% %time% - Error creating secondary task.
     schtasks /run /tn "%TASK_NAME%" /f >nul
 )
 
 echo %date% %time% - Secondary task created to start the main task after %DELAY_SECONDS% seconds.
-
-:: Run the secondary task immediately
-echo %date% %time% - Running the main task immediately...
-schtasks /run /tn "%START_TASK_NAME%" >nul
 
 :: Final log
 echo %date% %time% - Deployment script completed.
