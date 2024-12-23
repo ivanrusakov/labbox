@@ -10,7 +10,7 @@ $armTemplate = Get-Content -Path $InputTemplatePath -Raw | ConvertFrom-Json
 function Find-CSESections {
     param($resources)
     $resources | ForEach-Object {
-        if ($_.type -like 'Microsoft.Compute/virtualMachines/extensions' -and ($_.properties.type -eq 'CustomScript' -or $_.properties.type -eq 'CustomScriptExtension')) {
+        if ($_.type -like 'Microsoft.Compute/virtualMachines/extensions' -and $_.properties.publisher -eq 'Microsoft.Compute' -and $_.properties.type -eq 'CustomScriptExtension') {
             $_
         } elseif ($_.resources) {
             Find-CSESections -resources $_.resources
@@ -18,7 +18,7 @@ function Find-CSESections {
     }
 }
 
-# Find all CSE (Custom Script Extension) sections
+# Find all CSE (Custom Script Extension) sections, both nested and standalone
 $cseSections = Find-CSESections -resources $armTemplate.resources
 
 if (-not $cseSections -or $cseSections.Count -eq 0) {
@@ -28,11 +28,15 @@ if (-not $cseSections -or $cseSections.Count -eq 0) {
 
 # Process the first CSE section
 $cseSection = $cseSections | Select-Object -First 1
-$fileUris = $cseSection.properties.protectedSettings.fileUris
+$fileUris = if ($cseSection.properties.protectedSettings) {
+    $cseSection.properties.protectedSettings.fileUris
+} else {
+    @()
+}
 $commandToExecute = $cseSection.properties.settings.commandToExecute
 
-if (-not $fileUris -or -not $commandToExecute) {
-    Write-Error "CSE section does not contain required fileUris or commandToExecute."
+if (-not $commandToExecute) {
+    Write-Error "CSE section does not contain required commandToExecute."
     exit 1
 }
 
@@ -58,11 +62,11 @@ $runCommandResource = [PSCustomObject]@{
     }
 }
 
-# Remove all CSE sections from the resources
+# Remove all CSE sections from the resources, both nested and standalone
 function Remove-CSESections {
     param($resources)
     $resources | ForEach-Object {
-        if ($_.type -like 'Microsoft.Compute/virtualMachines/extensions' -and ($_.properties.type -eq 'CustomScript' -or $_.properties.type -eq 'CustomScriptExtension')) {
+        if ($_.type -like 'Microsoft.Compute/virtualMachines/extensions' -and $_.properties.publisher -eq 'Microsoft.Compute' -and $_.properties.type -eq 'CustomScriptExtension') {
             $null
         } elseif ($_.resources) {
             $_.resources = Remove-CSESections -resources $_.resources
