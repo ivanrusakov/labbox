@@ -87,11 +87,11 @@ function ConvertTo-CustomJson {
         [Parameter(Mandatory=$true)]
         [psobject]$InputObject
     )
-    $json = $InputObject | ConvertTo-Json -Depth 10
-    $json = $json -replace '\\u0022', '"' -replace '\\u0026', '&'
+    $json = $InputObject | ConvertTo-Json -Depth 10 -Compress
+    $json = $json -replace '\\u0027', "'" -replace '\\u0022', '"' -replace '\\u0026', '&'
     return $json
 }
 
 # Output the modified ARM template
 $customJson = ConvertTo-CustomJson -InputObject $armTemplate
-$customJson | Set-Content -Path $OutputTemplatePath
+[System.IO.File]::WriteAllText($OutputTemplatePath, $customJson, [System.Text.Encoding]::UTF8)
