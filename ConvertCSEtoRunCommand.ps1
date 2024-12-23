@@ -18,10 +18,18 @@ function Escape-Quotes {
 $armContent = Get-Content $InputTemplatePath -Raw
 $arm = $armContent | ConvertFrom-Json
 
-# Find first CSE by type containing 'CustomScript'
-$cse = $arm.resources | Where-Object { 
-    $_.type -eq "Microsoft.Compute/virtualMachines/extensions" -and 
-    ($_.properties.type -like "*CustomScript*" -or $_.properties.type -like "*CustomScriptExtension*")
+# Find VM resource
+$vm = $arm.resources | Where-Object { $_.type -eq "Microsoft.Compute/virtualMachines" } | Select-Object -First 1
+
+if (-not $vm) {
+    Write-Error "Virtual Machine resource not found."
+    exit
+}
+
+# Find CSE within VM's nested resources
+$cse = $vm.resources | Where-Object { 
+    $_.type -eq "extensions" -and 
+    $_.properties.type -eq "CustomScriptExtension"
 } | Select-Object -First 1
 
 if (-not $cse) {
@@ -29,11 +37,8 @@ if (-not $cse) {
     exit
 }
 
-# Extract VM name from CSE resource name
-$vmName = $cse.name.Split('/')[0]
-
-# Extract fileUris and command
-$fileUris = $cse.properties.settings.fileUris
+# Extract fileUris from protectedSettings and commandToExecute from settings
+$fileUris = $cse.properties.protectedSettings.fileUris
 $command = $cse.properties.settings.commandToExecute
 
 # Escape quotes in command
@@ -54,7 +59,7 @@ $escapedOneLiner = Escape-Quotes $oneLiner
 $runCmd = @{
     type = "Microsoft.Compute/virtualMachines/runCommands"
     apiVersion = "2021-07-01"
-    name = "$vmName/RunCustomScript"
+    name = "$($vm.name)/RunCustomScript"
     location = $arm.parameters.location.value
     properties = @{
         runCommandName = "RunCustomScript"
@@ -65,8 +70,10 @@ $runCmd = @{
     }
 }
 
-# Remove CSE and add Run Command
-$arm.resources = $arm.resources | Where-Object { $_.name -ne $cse.name }
+# Remove CSE from VM's nested resources
+$vm.resources = $vm.resources | Where-Object { $_.name -ne $cse.name }
+
+# Add Run Command to top-level resources
 $arm.resources += $runCmd
 
 # Output new template with proper formatting
