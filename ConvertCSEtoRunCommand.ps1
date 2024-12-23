@@ -81,5 +81,17 @@ $armTemplate.resources = Remove-CSESections -resources $armTemplate.resources
 # Add the new runCommands resource
 $armTemplate.resources += $runCommandResource
 
+# Custom function for JSON serialization with encoding fixes
+function ConvertTo-CustomJson {
+    param (
+        [Parameter(Mandatory=$true)]
+        [psobject]$InputObject
+    )
+    $json = $InputObject | ConvertTo-Json -Depth 10
+    $json = $json -replace '\\u0022', '"' -replace '\\u0026', '&'
+    return $json
+}
+
 # Output the modified ARM template
-$armTemplate | ConvertTo-Json -Depth 10 -Compress | Set-Content -Path $OutputTemplatePath
+$customJson = ConvertTo-CustomJson -InputObject $armTemplate
+$customJson | Set-Content -Path $OutputTemplatePath
