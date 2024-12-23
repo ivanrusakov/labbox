@@ -10,7 +10,7 @@ $armTemplate = Get-Content -Path $InputTemplatePath -Raw | ConvertFrom-Json
 function Find-CSESections {
     param($resources)
     $resources | ForEach-Object {
-        if ($_.type -like 'Microsoft.Compute/virtualMachines/extensions' -and $_.properties.publisher -eq 'Microsoft.Compute' -and $_.properties.type -eq 'CustomScriptExtension') {
+        if ($_.properties.publisher -eq 'Microsoft.Compute' -and $_.properties.type -eq 'CustomScriptExtension') {
             $_
         } elseif ($_.resources) {
             Find-CSESections -resources $_.resources
