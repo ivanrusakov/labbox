@@ -6,17 +6,9 @@ Param(
     [string]$OutputTemplatePath
 )
 
-# Function to escape double quotes in strings
-function Escape-Quotes {
-    param (
-        [string]$InputString
-    )
-    return $InputString -replace '"','`"'
-}
-
 # Load ARM template
 $armContent = Get-Content $InputTemplatePath -Raw
-$arm = $armContent | ConvertFrom-Json
+$arm = $armContent | ConvertFrom-Json -Depth 100
 
 # Find VM resource
 $vm = $arm.resources | Where-Object { $_.type -eq "Microsoft.Compute/virtualMachines" } | Select-Object -First 1
@@ -41,30 +33,28 @@ if (-not $cse) {
 $fileUris = $cse.properties.protectedSettings.fileUris
 $command = $cse.properties.settings.commandToExecute
 
-# Escape quotes in command
-$escapedCommand = Escape-Quotes $command
+if (-not $fileUris -or -not $command) {
+    Write-Error "fileUris or commandToExecute not found in CSE."
+    exit
+}
 
-# Generate one-liner
+# Generate one-liner script
 $downloads = $fileUris | ForEach-Object {
     $file = [System.IO.Path]::GetFileName($_)
-    $escapedUri = Escape-Quotes $_
-    "Invoke-WebRequest -Uri `"$escapedUri`" -OutFile `"$env:TEMP\$file`""
+    "Invoke-WebRequest -Uri `"$($_)`" -OutFile `"$env:TEMP\$file`""
 }
-$oneLiner = ($downloads + $escapedCommand) -join "; "
-
-# Escape quotes in the one-liner script
-$escapedOneLiner = Escape-Quotes $oneLiner
+$oneLiner = ($downloads + $command) -join "; "
 
 # Create Run Command resource
 $runCmd = @{
     type = "Microsoft.Compute/virtualMachines/runCommands"
     apiVersion = "2021-07-01"
     name = "$($vm.name)/RunCustomScript"
-    location = $arm.parameters.location.value
+    location = $vm.location
     properties = @{
         runCommandName = "RunCustomScript"
         source = @{
-            script = "$escapedOneLiner"
+            script = $oneLiner
         }
         asyncExecution = $false
     }
@@ -77,4 +67,4 @@ $vm.resources = $vm.resources | Where-Object { $_.name -ne $cse.name }
 $arm.resources += $runCmd
 
 # Output new template with proper formatting
-$arm | ConvertTo-Json -Depth 100 | Set-Content $OutputTemplatePath -Encoding UTF8
+$arm | ConvertTo-Json -Depth 100 -Compress:$false | Set-Content $OutputTemplatePath -Encoding UTF8
