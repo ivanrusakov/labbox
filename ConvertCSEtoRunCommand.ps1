@@ -6,16 +6,18 @@ param(
 # Read the input ARM template
 $armTemplate = Get-Content -Path $InputTemplatePath -Raw | ConvertFrom-Json
 
-# Find the first CSE (Custom Script Extension) section
-$cseSection = $armTemplate.resources | Where-Object {
-    $_.type -like 'Microsoft.Compute/virtualMachines/extensions' -and $_.properties.publisher -eq 'Microsoft.Azure.Extensions' -and $_.properties.type -eq 'CustomScript'
-} | Select-Object -First 1
+# Find any CSE (Custom Script Extension) section
+$cseSections = $armTemplate.resources | Where-Object {
+    $_.type -like 'Microsoft.Compute/virtualMachines/extensions' -and $_.properties.type -eq 'CustomScript'
+}
 
-if (-not $cseSection) {
-    Write-Error "No Custom Script Extension found in the template."
+if (-not $cseSections -or $cseSections.Count -eq 0) {
+    Write-Error "No Custom Script Extensions found in the template."
     exit 1
 }
 
+# Process the first CSE section
+$cseSection = $cseSections | Select-Object -First 1
 $fileUris = $cseSection.properties.settings.fileUris
 $commandToExecute = $cseSection.properties.settings.commandToExecute
 
@@ -24,9 +26,13 @@ if (-not $fileUris -or -not $commandToExecute) {
     exit 1
 }
 
+# Ensure parameters with quotes are properly escaped
+$escapedFileUris = $fileUris -join ', '
+$escapedCommand = $commandToExecute -replace '"', '""'
+
 # Generate a one-liner script for runCommands
 $downloadAndExecuteScript = (
-    "$fileUris | ForEach-Object { Invoke-WebRequest -Uri $_ -OutFile (Split-Path -Leaf $_) }; & { $commandToExecute }"
+    "$escapedFileUris | ForEach-Object { Invoke-WebRequest -Uri \"$_\" -OutFile (Split-Path -Leaf $_) }; & { \"$escapedCommand\" }"
 )
 
 # Create a new runCommands resource
@@ -42,7 +48,7 @@ $runCommandResource = [PSCustomObject]@{
     }
 }
 
-# Remove the CSE section from the resources
+# Remove all CSE sections from the resources
 $armTemplate.resources = $armTemplate.resources | Where-Object {
     !($_.type -like 'Microsoft.Compute/virtualMachines/extensions' -and $_.properties.type -eq 'CustomScript')
 }
