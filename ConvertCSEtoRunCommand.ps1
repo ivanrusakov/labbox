@@ -45,7 +45,7 @@ $escapedCommand = $commandToExecute -replace '"', '""'
 
 # Generate a one-liner script for runCommands
 $downloadAndExecuteScript = @"
-$fileUris | ForEach-Object { Invoke-WebRequest -Uri `"$_`" -OutFile (Split-Path -Leaf $_) }
+$fileUris | ForEach-Object { Invoke-WebRequest -Uri \"$_\" -OutFile (Split-Path -Leaf $_) }
 & { $escapedCommand }
 "@
 
@@ -82,4 +82,4 @@ $armTemplate.resources = Remove-CSESections -resources $armTemplate.resources
 $armTemplate.resources += $runCommandResource
 
 # Output the modified ARM template
-$armTemplate | ConvertTo-Json -Depth 10 | Set-Content -Path $OutputTemplatePath
+$armTemplate | ConvertTo-Json -Depth 10 -Compress | Set-Content -Path $OutputTemplatePath
