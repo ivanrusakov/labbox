@@ -1,70 +1,54 @@
-Param(
-    [Parameter(Mandatory=$true)]
+param(
     [string]$InputTemplatePath,
-
-    [Parameter(Mandatory=$true)]
     [string]$OutputTemplatePath
 )
 
-# Load ARM template
-$armContent = Get-Content $InputTemplatePath -Raw
-$arm = $armContent | ConvertFrom-Json -Depth 100
+# Read the input ARM template
+$armTemplate = Get-Content -Path $InputTemplatePath -Raw | ConvertFrom-Json
 
-# Find VM resource
-$vm = $arm.resources | Where-Object { $_.type -eq "Microsoft.Compute/virtualMachines" } | Select-Object -First 1
-
-if (-not $vm) {
-    Write-Error "Virtual Machine resource not found."
-    exit
-}
-
-# Find CSE within VM's nested resources
-$cse = $vm.resources | Where-Object { 
-    $_.type -eq "extensions" -and 
-    $_.properties.type -eq "CustomScriptExtension"
+# Find the first CSE (Custom Script Extension) section
+$cseSection = $armTemplate.resources | Where-Object {
+    $_.type -like 'Microsoft.Compute/virtualMachines/extensions' -and $_.properties.publisher -eq 'Microsoft.Azure.Extensions' -and $_.properties.type -eq 'CustomScript'
 } | Select-Object -First 1
 
-if (-not $cse) {
-    Write-Error "Custom Script Extension not found."
-    exit
+if (-not $cseSection) {
+    Write-Error "No Custom Script Extension found in the template."
+    exit 1
 }
 
-# Extract fileUris from protectedSettings and commandToExecute from settings
-$fileUris = $cse.properties.protectedSettings.fileUris
-$command = $cse.properties.settings.commandToExecute
+$fileUris = $cseSection.properties.settings.fileUris
+$commandToExecute = $cseSection.properties.settings.commandToExecute
 
-if (-not $fileUris -or -not $command) {
-    Write-Error "fileUris or commandToExecute not found in CSE."
-    exit
+if (-not $fileUris -or -not $commandToExecute) {
+    Write-Error "CSE section does not contain required fileUris or commandToExecute."
+    exit 1
 }
 
-# Generate one-liner script
-$downloads = $fileUris | ForEach-Object {
-    $file = [System.IO.Path]::GetFileName($_)
-    "Invoke-WebRequest -Uri `"$($_)`" -OutFile `"$env:TEMP\$file`""
-}
-$oneLiner = ($downloads + $command) -join "; "
+# Generate a one-liner script for runCommands
+$downloadAndExecuteScript = (
+    "$fileUris | ForEach-Object { Invoke-WebRequest -Uri $_ -OutFile (Split-Path -Leaf $_) }; & { $commandToExecute }"
+)
 
-# Create Run Command resource
-$runCmd = @{
-    type = "Microsoft.Compute/virtualMachines/runCommands"
-    apiVersion = "2021-07-01"
-    name = "$($vm.name)/RunCustomScript"
-    location = $vm.location
+# Create a new runCommands resource
+$runCommandResource = [PSCustomObject]@{
+    type       = 'Microsoft.Compute/virtualMachines/runCommands'
+    apiVersion = '2022-07-01'
+    location   = $armTemplate.location
     properties = @{
-        runCommandName = "RunCustomScript"
         source = @{
-            script = $oneLiner
+            script = $downloadAndExecuteScript
         }
-        asyncExecution = $false
+        parameters = @()
     }
 }
 
-# Remove CSE from VM's nested resources
-$vm.resources = $vm.resources | Where-Object { $_.name -ne $cse.name }
+# Remove the CSE section from the resources
+$armTemplate.resources = $armTemplate.resources | Where-Object {
+    !($_.type -like 'Microsoft.Compute/virtualMachines/extensions' -and $_.properties.type -eq 'CustomScript')
+}
 
-# Add Run Command to top-level resources
-$arm.resources += $runCmd
+# Add the new runCommands resource
+$armTemplate.resources += $runCommandResource
 
-# Output new template with proper formatting
-$arm | ConvertTo-Json -Depth 100 -Compress:$false | Set-Content $OutputTemplatePath -Encoding UTF8
+# Output the modified ARM template
+$armTemplate | ConvertTo-Json -Depth 10 | Set-Content -Path $OutputTemplatePath
