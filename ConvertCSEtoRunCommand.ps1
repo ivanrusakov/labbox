@@ -6,10 +6,20 @@ param(
 # Read the input ARM template
 $armTemplate = Get-Content -Path $InputTemplatePath -Raw | ConvertFrom-Json
 
-# Find any CSE (Custom Script Extension) section
-$cseSections = $armTemplate.resources | Where-Object {
-    $_.type -like 'Microsoft.Compute/virtualMachines/extensions' -and ($_.properties.type -eq 'CustomScript' -or $_.properties.type -eq 'CustomScriptExtension')
+# Function to find CSE sections
+function Find-CSESections {
+    param($resources)
+    $resources | ForEach-Object {
+        if ($_.type -like 'Microsoft.Compute/virtualMachines/extensions' -and ($_.properties.type -eq 'CustomScript' -or $_.properties.type -eq 'CustomScriptExtension')) {
+            $_
+        } elseif ($_.resources) {
+            Find-CSESections -resources $_.resources
+        }
+    }
 }
+
+# Find all CSE (Custom Script Extension) sections
+$cseSections = Find-CSESections -resources $armTemplate.resources
 
 if (-not $cseSections -or $cseSections.Count -eq 0) {
     Write-Error "No Custom Script Extensions found in the template."
@@ -49,9 +59,20 @@ $runCommandResource = [PSCustomObject]@{
 }
 
 # Remove all CSE sections from the resources
-$armTemplate.resources = $armTemplate.resources | Where-Object {
-    !($_.type -like 'Microsoft.Compute/virtualMachines/extensions' -and ($_.properties.type -eq 'CustomScript' -or $_.properties.type -eq 'CustomScriptExtension'))
+function Remove-CSESections {
+    param($resources)
+    $resources | ForEach-Object {
+        if ($_.type -like 'Microsoft.Compute/virtualMachines/extensions' -and ($_.properties.type -eq 'CustomScript' -or $_.properties.type -eq 'CustomScriptExtension')) {
+            $null
+        } elseif ($_.resources) {
+            $_.resources = Remove-CSESections -resources $_.resources
+            $_
+        } else {
+            $_
+        }
+    }
 }
+$armTemplate.resources = Remove-CSESections -resources $armTemplate.resources
 
 # Add the new runCommands resource
 $armTemplate.resources += $runCommandResource
