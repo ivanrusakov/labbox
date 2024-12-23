@@ -8,7 +8,7 @@ $armTemplate = Get-Content -Path $InputTemplatePath -Raw | ConvertFrom-Json
 
 # Find any CSE (Custom Script Extension) section
 $cseSections = $armTemplate.resources | Where-Object {
-    $_.type -like 'Microsoft.Compute/virtualMachines/extensions' -and $_.properties.type -eq 'CustomScript'
+    $_.type -like 'Microsoft.Compute/virtualMachines/extensions' -and ($_.properties.type -eq 'CustomScript' -or $_.properties.type -eq 'CustomScriptExtension')
 }
 
 if (-not $cseSections -or $cseSections.Count -eq 0) {
@@ -50,7 +50,7 @@ $runCommandResource = [PSCustomObject]@{
 
 # Remove all CSE sections from the resources
 $armTemplate.resources = $armTemplate.resources | Where-Object {
-    !($_.type -like 'Microsoft.Compute/virtualMachines/extensions' -and $_.properties.type -eq 'CustomScript')
+    !($_.type -like 'Microsoft.Compute/virtualMachines/extensions' -and ($_.properties.type -eq 'CustomScript' -or $_.properties.type -eq 'CustomScriptExtension'))
 }
 
 # Add the new runCommands resource
