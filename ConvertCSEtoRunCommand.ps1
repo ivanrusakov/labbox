@@ -18,13 +18,19 @@ function Escape-Quotes {
 $armContent = Get-Content $InputTemplatePath -Raw
 $arm = $armContent | ConvertFrom-Json
 
-# Find first CSE
-$cse = $arm.resources | Where-Object { $_.type -eq "Microsoft.Compute/virtualMachines/extensions" -and $_.name -match "CustomScriptExtension" } | Select-Object -First 1
+# Find first CSE by type containing 'CustomScript'
+$cse = $arm.resources | Where-Object { 
+    $_.type -eq "Microsoft.Compute/virtualMachines/extensions" -and 
+    ($_.properties.type -like "*CustomScript*" -or $_.properties.type -like "*CustomScriptExtension*")
+} | Select-Object -First 1
 
 if (-not $cse) {
     Write-Error "Custom Script Extension not found."
     exit
 }
+
+# Extract VM name from CSE resource name
+$vmName = $cse.name.Split('/')[0]
 
 # Extract fileUris and command
 $fileUris = $cse.properties.settings.fileUris
@@ -48,7 +54,7 @@ $escapedOneLiner = Escape-Quotes $oneLiner
 $runCmd = @{
     type = "Microsoft.Compute/virtualMachines/runCommands"
     apiVersion = "2021-07-01"
-    name = "$($cse.name.Split('/')[0])/RunCustomScript"
+    name = "$vmName/RunCustomScript"
     location = $arm.parameters.location.value
     properties = @{
         runCommandName = "RunCustomScript"
