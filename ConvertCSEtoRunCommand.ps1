@@ -18,7 +18,7 @@ if (-not $cseSections -or $cseSections.Count -eq 0) {
 
 # Process the first CSE section
 $cseSection = $cseSections | Select-Object -First 1
-$fileUris = $cseSection.properties.settings.fileUris
+$fileUris = $cseSection.properties.protectedSettings.fileUris
 $commandToExecute = $cseSection.properties.settings.commandToExecute
 
 if (-not $fileUris -or -not $commandToExecute) {
@@ -27,12 +27,13 @@ if (-not $fileUris -or -not $commandToExecute) {
 }
 
 # Ensure parameters with quotes are properly escaped
-$escapedCommand = $commandToExecute -replace '"', '`"'
+$escapedCommand = $commandToExecute -replace '"', '""'
 
 # Generate a one-liner script for runCommands
-$downloadAndExecuteScript = (
-    "$fileUris | ForEach-Object { Invoke-WebRequest -Uri \"$_\" -OutFile (Split-Path -Leaf $_) }; & { $escapedCommand }"
-)
+$downloadAndExecuteScript = @"
+$fileUris | ForEach-Object { Invoke-WebRequest -Uri `"$_`" -OutFile (Split-Path -Leaf $_) }
+& { $escapedCommand }
+"@
 
 # Create a new runCommands resource
 $runCommandResource = [PSCustomObject]@{
