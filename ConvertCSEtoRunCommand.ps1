@@ -27,12 +27,11 @@ if (-not $fileUris -or -not $commandToExecute) {
 }
 
 # Ensure parameters with quotes are properly escaped
-$escapedFileUris = $fileUris -join ', '
-$escapedCommand = $commandToExecute -replace '"', '""'
+$escapedCommand = $commandToExecute -replace '"', '`"'
 
 # Generate a one-liner script for runCommands
 $downloadAndExecuteScript = (
-    "$escapedFileUris | ForEach-Object { Invoke-WebRequest -Uri \"$_\" -OutFile (Split-Path -Leaf $_) }; & { \"$escapedCommand\" }"
+    "$fileUris | ForEach-Object { Invoke-WebRequest -Uri \"$_\" -OutFile (Split-Path -Leaf $_) }; & { $escapedCommand }"
 )
 
 # Create a new runCommands resource
