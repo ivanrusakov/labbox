@@ -43,7 +43,7 @@ echo The time %DELAY_SECONDS% seconds from now will be: %start_date% %start_time
 
 :: Create a secondary task to start the main task after a delay
 echo %date% %time% - Creating secondary task to start the main task at calculated time...
-schtasks /create /tn "%START_TASK_NAME%" /tr "schtasks /run /tn \"%TASK_NAME%\"" /ru "NT AUTHORITY\SYSTEM" /sc once /st "%start_time%" /sd "%start_date%" /f >nul
+schtasks /create /tn "%START_TASK_NAME%" /tr "schtasks /run /tn \"%TASK_NAME%\"" /ru "SYSTEM" /sc once /st "%start_time%" /sd "%start_date%" /f /rl HIGHEST >nul
 if %errorlevel% neq 0 (
     echo %date% %time% - Error creating secondary task. Attempting to run the main task immediately.
     exit /b 1
