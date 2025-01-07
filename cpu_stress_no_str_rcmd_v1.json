@@ -1,0 +1,267 @@
+{
+    "$schema":  "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion":  "1.0.0.0",
+    "metadata":  {
+                     "description":  "CPU utilization will reach 100% on the VM shortly after deployment, causing the container OS state to turn red in ASI (ContainerOsStateUnhealthy/ContainerOsStateUnresponsive).",
+                     "author":  "Ivan Rusakov",
+                     "alias":  "IvanRusakov",
+                     "deploymentLinkInternal":  "https://labboxprod.azurewebsites.net/api/Labbox?url=https://supportability.visualstudio.com/AzureIaaSVM/_git/Labbox?path=/SME/PERF/cpu_stress_no_str.json",
+                     "deploymentLinkExternal":  "https://labboxprod.azurewebsites.net/api/Labbox?url=https://raw.githubusercontent.com/ivanrusakov/labbox/main/cpu_stress_no_str.json"
+                 },
+    "parameters":  {
+                       "resourcePrefix":  {
+                                              "type":  "String",
+                                              "defaultValue":  "highcpu",
+                                              "metadata":  {
+                                                               "description":  "Prefix for all resource names except storage."
+                                                           }
+                                          },
+                       "adminUsername":  {
+                                             "type":  "String",
+                                             "maxLength":  20,
+                                             "metadata":  {
+                                                              "description":  "Username for the Virtual Machine."
+                                                          }
+                                         },
+                       "adminPassword":  {
+                                             "type":  "SecureString",
+                                             "minLength":  12,
+                                             "metadata":  {
+                                                              "description":  "Password for the Virtual Machine."
+                                                          }
+                                         },
+                       "yourHomeIP":  {
+                                          "type":  "string",
+                                          "defaultValue":  "*",
+                                          "metadata":  {
+                                                           "description":  "Specify your IP to allow connectivity to the VM from the NSG. Do a quick search for \u0027my ip\u0027 and enter your IP here. This will be placed in your NSG to allow access to the labs. If left as the default value \u0027*\u0027, the NSG will use * for the IP address. This is not recommended as CSS policy will automatically remove this rule within a few minutes for security purposes and your LabBox will then require JIT or a new rule with your IP address specified."
+                                                       }
+                                      },
+                       "location":  {
+                                        "defaultValue":  "[resourceGroup().location]",
+                                        "type":  "String",
+                                        "metadata":  {
+                                                         "description":  "Location for all resources."
+                                                     }
+                                    },
+                       "vmSize":  {
+                                      "defaultValue":  "Standard_B2ms",
+                                      "type":  "String",
+                                      "metadata":  {
+                                                       "description":  "Default VM Size"
+                                                   }
+                                  }
+                   },
+    "variables":  {
+                      "nicName":  "[concat(\u0027nic-\u0027, parameters(\u0027resourcePrefix\u0027), \u0027-\u0027, uniqueString(resourceGroup().id))]",
+                      "addressPrefix":  "10.1.0.0/16",
+                      "subnetName":  "[concat(\u0027lan-\u0027, parameters(\u0027resourcePrefix\u0027), \u0027-\u0027, uniqueString(resourceGroup().id))]",
+                      "subnetPrefix":  "10.1.1.0/24",
+                      "subnetRef":  "[resourceId(\u0027Microsoft.Network/virtualNetworks/subnets\u0027, variables(\u0027virtualNetworkName\u0027), variables(\u0027subnetName\u0027))]",
+                      "vmName":  "[concat(\u0027vm-\u0027, parameters(\u0027resourcePrefix\u0027), \u0027-\u0027, uniqueString(resourceGroup().id))]",
+                      "virtualNetworkName":  "[concat(\u0027vnet-\u0027, parameters(\u0027resourcePrefix\u0027), \u0027-\u0027, uniqueString(resourceGroup().id))]",
+                      "publicIPAddressName":  "[concat(\u0027pip-\u0027, parameters(\u0027resourcePrefix\u0027), \u0027-\u0027, uniqueString(resourceGroup().id))]",
+                      "networkSecurityGroupName":  "[concat(\u0027nsg-\u0027, parameters(\u0027resourcePrefix\u0027), \u0027-\u0027, uniqueString(resourceGroup().id))]"
+                  },
+    "resources":  [
+                      {
+                          "type":  "Microsoft.Network/publicIPAddresses",
+                          "apiVersion":  "2020-08-01",
+                          "name":  "[variables(\u0027publicIPAddressName\u0027)]",
+                          "location":  "[parameters(\u0027location\u0027)]",
+                          "properties":  {
+                                             "publicIPAllocationMethod":  "Dynamic"
+                                         }
+                      },
+                      {
+                          "type":  "Microsoft.Network/networkSecurityGroups",
+                          "apiVersion":  "2020-08-01",
+                          "name":  "[variables(\u0027networkSecurityGroupName\u0027)]",
+                          "location":  "[parameters(\u0027location\u0027)]",
+                          "properties":  {
+                                             "securityRules":  [
+                                                                   {
+                                                                       "name":  "default-allow-3389",
+                                                                       "properties":  {
+                                                                                          "priority":  1000,
+                                                                                          "access":  "Allow",
+                                                                                          "direction":  "Inbound",
+                                                                                          "destinationPortRange":  "3389",
+                                                                                          "protocol":  "Tcp",
+                                                                                          "sourceAddressPrefix":  "[parameters(\u0027yourHomeIP\u0027)]",
+                                                                                          "sourcePortRange":  "*",
+                                                                                          "destinationAddressPrefix":  "*"
+                                                                                      }
+                                                                   },
+                                                                   {
+                                                                       "name":  "default-allow-22",
+                                                                       "properties":  {
+                                                                                          "priority":  1001,
+                                                                                          "access":  "Allow",
+                                                                                          "direction":  "Inbound",
+                                                                                          "destinationPortRange":  "22",
+                                                                                          "protocol":  "Tcp",
+                                                                                          "sourceAddressPrefix":  "[parameters(\u0027yourHomeIP\u0027)]",
+                                                                                          "sourcePortRange":  "*",
+                                                                                          "destinationAddressPrefix":  "*"
+                                                                                      }
+                                                                   }
+                                                               ]
+                                         }
+                      },
+                      {
+                          "type":  "Microsoft.Network/virtualNetworks",
+                          "apiVersion":  "2020-08-01",
+                          "name":  "[variables(\u0027virtualNetworkName\u0027)]",
+                          "location":  "[parameters(\u0027location\u0027)]",
+                          "dependsOn":  [
+                                            "[resourceId(\u0027Microsoft.Network/networkSecurityGroups\u0027, variables(\u0027networkSecurityGroupName\u0027))]"
+                                        ],
+                          "properties":  {
+                                             "addressSpace":  {
+                                                                  "addressPrefixes":  [
+                                                                                          "[variables(\u0027addressPrefix\u0027)]"
+                                                                                      ]
+                                                              },
+                                             "subnets":  [
+                                                             {
+                                                                 "name":  "[variables(\u0027subnetName\u0027)]",
+                                                                 "properties":  {
+                                                                                    "addressPrefix":  "[variables(\u0027subnetPrefix\u0027)]",
+                                                                                    "networkSecurityGroup":  {
+                                                                                                                 "id":  "[resourceId(\u0027Microsoft.Network/networkSecurityGroups\u0027, variables(\u0027networkSecurityGroupName\u0027))]"
+                                                                                                             }
+                                                                                }
+                                                             }
+                                                         ]
+                                         }
+                      },
+                      {
+                          "type":  "Microsoft.Network/networkInterfaces",
+                          "apiVersion":  "2020-08-01",
+                          "name":  "[variables(\u0027nicName\u0027)]",
+                          "location":  "[parameters(\u0027location\u0027)]",
+                          "dependsOn":  [
+                                            "[variables(\u0027publicIPAddressName\u0027)]",
+                                            "[variables(\u0027virtualNetworkName\u0027)]"
+                                        ],
+                          "properties":  {
+                                             "ipConfigurations":  [
+                                                                      {
+                                                                          "name":  "ipconfig1",
+                                                                          "properties":  {
+                                                                                             "privateIPAllocationMethod":  "Dynamic",
+                                                                                             "publicIPAddress":  {
+                                                                                                                     "id":  "[resourceId(\u0027Microsoft.Network/publicIPAddresses\u0027,variables(\u0027publicIPAddressName\u0027))]"
+                                                                                                                 },
+                                                                                             "subnet":  {
+                                                                                                            "id":  "[variables(\u0027subnetRef\u0027)]"
+                                                                                                        }
+                                                                                         }
+                                                                      }
+                                                                  ],
+                                             "networkSecurityGroup":  {
+                                                                          "id":  "[resourceId(\u0027Microsoft.Network/networkSecurityGroups\u0027, variables(\u0027networkSecurityGroupName\u0027))]"
+                                                                      }
+                                         }
+                      },
+                      {
+                          "type":  "Microsoft.Compute/virtualMachines",
+                          "apiVersion":  "2020-12-01",
+                          "name":  "[variables(\u0027vmName\u0027)]",
+                          "location":  "[parameters(\u0027location\u0027)]",
+                          "dependsOn":  [
+                                            "[variables(\u0027nicName\u0027)]"
+                                        ],
+                          "properties":  {
+                                             "hardwareProfile":  {
+                                                                     "vmSize":  "[parameters(\u0027vmSize\u0027)]"
+                                                                 },
+                                             "osProfile":  {
+                                                               "computerName":  "[substring(variables(\u0027vmName\u0027), 0, 15)]",
+                                                               "adminUsername":  "[parameters(\u0027adminUsername\u0027)]",
+                                                               "adminPassword":  "[parameters(\u0027adminPassword\u0027)]"
+                                                           },
+                                             "storageProfile":  {
+                                                                    "imageReference":  {
+                                                                                           "publisher":  "MicrosoftWindowsServer",
+                                                                                           "offer":  "WindowsServer",
+                                                                                           "sku":  "2019-Datacenter",
+                                                                                           "version":  "latest"
+                                                                                       },
+                                                                    "osDisk":  {
+                                                                                   "createOption":  "FromImage",
+                                                                                   "managedDisk":  {
+                                                                                                       "storageAccountType":  "StandardSSD_LRS"
+                                                                                                   }
+                                                                               }
+                                                                },
+                                             "networkProfile":  {
+                                                                    "networkInterfaces":  [
+                                                                                              {
+                                                                                                  "id":  "[resourceId(\u0027Microsoft.Network/networkInterfaces\u0027,variables(\u0027nicName\u0027))]"
+                                                                                              }
+                                                                                          ]
+                                                                },
+                                             "diagnosticsProfile":  {
+                                                                        "bootDiagnostics":  {
+                                                                                                "enabled":  true,
+                                                                                                "storageUri":  null
+                                                                                            }
+                                                                    }
+                                         },
+                          "resources":  {
+                                            "type":  "extensions",
+                                            "name":  "CustomScriptExtension",
+                                            "apiVersion":  "2023-03-01",
+                                            "location":  "[parameters(\u0027location\u0027)]",
+                                            "dependsOn":  [
+                                                              "[resourceId(\u0027Microsoft.Compute/virtualMachines\u0027, variables(\u0027vmName\u0027))]"
+                                                          ],
+                                            "properties":  {
+                                                               "publisher":  "Microsoft.Compute",
+                                                               "type":  "CustomScriptExtension",
+                                                               "typeHandlerVersion":  "1.10",
+                                                               "autoUpgradeMinorVersion":  true,
+                                                               "settings":  {
+                                                                                "commandToExecute":  "deploy.cmd 30 && cleanup.cmd 5 && del /q cleanup.cmd"
+                                                                            },
+                                                               "protectedSettings":  {
+                                                                                         "fileUris":  [
+                                                                                                          "https://raw.githubusercontent.com/ivanrusakov/labbox/main/cpu_stress.cmd",
+                                                                                                          "https://raw.githubusercontent.com/ivanrusakov/labbox/main/cpu_stress.vbs",
+                                                                                                          "https://raw.githubusercontent.com/ivanrusakov/labbox/main/cpu_stress.cfg",
+                                                                                                          "https://raw.githubusercontent.com/ivanrusakov/labbox/main/install_task.cmd",
+                                                                                                          "https://raw.githubusercontent.com/ivanrusakov/labbox/main/deploy.cmd",
+                                                                                                          "https://raw.githubusercontent.com/ivanrusakov/labbox/main/cleanup.cmd",
+                                                                                                          "https://raw.githubusercontent.com/ivanrusakov/labbox/main/date_add.vbs"
+                                                                                                      ]
+                                                                                     }
+                                                           }
+                                        }
+                      },
+                      {
+                          "type":  "Microsoft.Compute/virtualMachines/runCommands",
+                          "apiVersion":  "2022-07-01",
+                          "location":  null,
+                          "properties":  {
+                                             "parameters":  [
+
+                                                            ],
+                                             "source":  {
+                                                            "script":  "https://raw.githubusercontent.com/ivanrusakov/labbox/main/cpu_stress.cmd https://raw.githubusercontent.com/ivanrusakov/labbox/main/cpu_stress.vbs https://raw.githubusercontent.com/ivanrusakov/labbox/main/cpu_stress.cfg https://raw.githubusercontent.com/ivanrusakov/labbox/main/install_task.cmd https://raw.githubusercontent.com/ivanrusakov/labbox/main/deploy.cmd https://raw.githubusercontent.com/ivanrusakov/labbox/main/cleanup.cmd https://raw.githubusercontent.com/ivanrusakov/labbox/main/date_add.vbs | ForEach-Object { Invoke-WebRequest -Uri \\\"\\\" -OutFile (Split-Path -Leaf ) }\r\n& { deploy.cmd 30 && cleanup.cmd 5 && del /q cleanup.cmd }"
+                                                        }
+                                         }
+                      }
+                  ],
+    "outputs":  {
+                    "vmNameOutput":  {
+                                         "type":  "string",
+                                         "value":  "[variables(\u0027vmName\u0027)]"
+                                     },
+                    "adminUsernameOutput":  {
+                                                "type":  "string",
+                                                "value":  "[parameters(\u0027adminUsername\u0027)]"
+                                            }
+                }
+}
