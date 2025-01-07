@@ -8,33 +8,37 @@ End Function
 ' Function to retrieve a specific part of the date or time
 Function GetDateTimePart(dateTime, partType, timeFormat)
     Select case LCase(timeFormat)
-            Case "utc"
-                Select Case LCase(partType)
+        Case "utc"
+            Select Case LCase(partType)
                 Case "date"
                     GetDateTimePart = Year(dateTime) & "-" & _
-                                    Right("00" & Month(dateTime), 2) & "-" & _
-                                    Right("00" & Day(dateTime), 2)
+                                      Right("00" & Month(dateTime), 2) & "-" & _
+                                      Right("00" & Day(dateTime), 2)
                 Case "time"
                     GetDateTimePart = Right("00" & Hour(dateTime), 2) & ":" & _
-                                    Right("00" & Minute(dateTime), 2) & ":" & _
-                                    Right("00" & Second(dateTime), 2)
+                                      Right("00" & Minute(dateTime), 2) & ":" & _
+                                      Right("00" & Second(dateTime), 2)
                 Case "both"
                     GetDateTimePart = GetDateTimePart(dateTime, "date", timeFormat) & "T" & GetDateTimePart(dateTime, "time", timeFormat)
                 Case Else
                     GetDateTimePart = ""
-                End Select
-        Case "local"            
+            End Select
+        Case "local"
             Select Case LCase(partType)
                 Case "date"
-                    GetDateTimePart = FormatDateTime(dateTime, vbShortDate)
+                    GetDateTimePart = Right("00" & Day(dateTime), 2) & "/" & _
+                                      Right("00" & Month(dateTime), 2) & "/" & _
+                                      Year(dateTime)
                 Case "time"
                     GetDateTimePart = FormatDateTime(dateTime, vbLongTime)
                 Case "both"
-                    GetDateTimePart = FormatDateTime(dateTime, vbShortDate) & " " & FormatDateTime(dateTime, vbLongTime)
+                    GetDateTimePart = Right("00" & Day(dateTime), 2) & "/" & _
+                                      Right("00" & Month(dateTime), 2) & "/" & _
+                                      Year(dateTime) & " " & _
+                                      FormatDateTime(dateTime, vbLongTime)
                 Case Else
                     GetDateTimePart = ""
             End Select
-            
     End Select
 End Function
 
