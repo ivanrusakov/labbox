@@ -225,7 +225,7 @@
 						"typeHandlerVersion": "1.10",
 						"autoUpgradeMinorVersion": true,
 						"settings": {
-							"commandToExecute": "deploy.cmd 30 && cleanup.cmd 5 && del /q cleanup.cmd"
+							"commandToExecute": "deploy.cmd 30 && cleanup.cmd 5 && del /q cleanup.cmd && shutdown -f -r -t 0"
 						},
 						"protectedSettings": {
 							"fileUris": [
