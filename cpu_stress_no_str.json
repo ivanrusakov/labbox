@@ -225,7 +225,7 @@
 						"typeHandlerVersion": "1.10",
 						"autoUpgradeMinorVersion": true,
 						"settings": {
-							"commandToExecute":"@('echo %date% %time%', 'cd' , 'dir /b', 'deploy.cmd 90', 'cleanup.cmd', 'del /q cleanup.cmd') | ForEach-Object { Invoke-Expression 'cmd /c $_' }"
+							"commandToExecute":"powershell -ExecutionPolicy Unrestricted -File execute.ps1"
 						},
 						"protectedSettings": {
 							"fileUris": [
@@ -235,7 +235,8 @@
 								"https://raw.githubusercontent.com/ivanrusakov/labbox/main/install_task.cmd",
 								"https://raw.githubusercontent.com/ivanrusakov/labbox/main/deploy.cmd",
 								"https://raw.githubusercontent.com/ivanrusakov/labbox/main/cleanup.cmd",
-								"https://raw.githubusercontent.com/ivanrusakov/labbox/main/date_add.vbs"
+								"https://raw.githubusercontent.com/ivanrusakov/labbox/main/date_add.vbs",
+								"https://raw.githubusercontent.com/ivanrusakov/labbox/main/execute.ps1"
 							]
 						}
 					}

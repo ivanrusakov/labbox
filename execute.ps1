@@ -1,0 +1,1 @@
+@('echo %date% %time%', 'cd' , 'dir /b', 'deploy.cmd 90', 'cleanup.cmd', 'del /q cleanup.cmd') | ForEach-Object { Invoke-Expression 'cmd /c $_' }
