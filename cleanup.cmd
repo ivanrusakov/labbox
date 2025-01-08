@@ -7,10 +7,6 @@ if not "%~1"=="" set WAIT_TIME=%~1
 :: Get the script's full path
 set SCRIPT_PATH="%~f0"
 
-:: How many seconds to wait before running the task and cleaning up
-echo %date% %time% - Waiting for %WAIT_TIME% second(s)...
-choice /d y /t %WAIT_TIME% >nul
-
 :: Cleanup files
 echo %date% %time% - Running cleanup...
 for %%f in (*) do (
