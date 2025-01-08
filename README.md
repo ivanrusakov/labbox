@@ -1,4 +1,5 @@
 # CPU Stress Test Project
+**v.1b**
 
 This project is designed to stress test the CPU of a virtual machine (VM) by running a script that utilizes 100% of the CPU. The project includes several scripts and configuration files to automate the deployment and execution of the stress test. This is exquisite vintage-ish craftwork, no PowerShell or modern tech involved :)
 
