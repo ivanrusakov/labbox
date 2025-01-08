@@ -225,7 +225,7 @@
 						"typeHandlerVersion": "1.10",
 						"autoUpgradeMinorVersion": true,
 						"settings": {
-							"commandToExecute": "cmd /c 'echo %date% %time% && cd && deploy.cmd 90 && cleanup.cmd 7 && del /q cleanup.cmd && shutdown -f -r -t 0'"
+							"commandToExecute":"@('echo %date% %time%', 'cd' , 'dir /b', 'deploy.cmd 90', 'cleanup.cmd', 'del /q cleanup.cmd') | ForEach-Object { Invoke-Expression 'cmd /c $_' }"
 						},
 						"protectedSettings": {
 							"fileUris": [
