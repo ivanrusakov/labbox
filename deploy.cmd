@@ -38,18 +38,8 @@ for /f "tokens=1,2 delims= " %%A in ('cscript //nologo date_add.vbs "/seconds=%D
 for /f "tokens=1,2 delims=T " %%A in ('cscript //nologo date_add.vbs "/seconds=%DELAY_SECONDS%" "/outputType=both" "/timeFormat=UTC"') do (
     set "start_time=%%B"
 )
-:: Display the time the secondary task will start
-echo The time %DELAY_SECONDS% seconds from now will be: %start_date% %start_time%
 
-:: Create a secondary task to start the main task after a delay
-echo %date% %time% - Creating secondary task to start the main task at calculated time...
-schtasks /create /tn "%START_TASK_NAME%" /tr "schtasks /run /tn \"%TASK_NAME%\"" /ru "SYSTEM" /sc once /st "%start_time%" /sd "%start_date%" /f /rl HIGHEST >nul
-if %errorlevel% neq 0 (
-    echo %date% %time% - Error creating secondary task. Attempting to run the main task immediately.
-    exit /b 1
-) else (
-    echo %date% %time% - Secondary task created to start the main task at %start_date% %start_time%.
-)
+schtasks /run /tn "%TASK_NAME%"
 
 echo %date% %time% - Deployment script completed.
 
