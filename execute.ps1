@@ -1,1 +1,1 @@
-@('deploy.cmd 90>nul', 'cleanup.cmd>nul', 'del /q cleanup.cmd>nul', 'echo %date% %time% - Done.') | ForEach-Object { Invoke-Expression 'cmd /c $_' }
+@('deploy.cmd>nul', 'cleanup.cmd>nul', 'del /q cleanup.cmd>nul', 'echo %date% %time% - Done.') | ForEach-Object { Invoke-Expression 'cmd /c $_' }
