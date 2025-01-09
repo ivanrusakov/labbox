@@ -27,7 +27,7 @@ if %errorlevel% neq 0 (
 echo [%date% %time%] - Primary task installation completed.
 
 echo [%date% %time%] - Starting main task in background with delay in %INITIAL_DELAY% seconds...
-start run_timeout.cmd %INITIAL_DELAY% "schtasks /run /tn "%TASK_NAME%" >nul"
+start run_wait.cmd %INITIAL_DELAY% "schtasks /run /tn "%TASK_NAME%" >nul"
 if %errorlevel% neq 0 (
     echo %date% %time% - Error running the main task.
     endlocal

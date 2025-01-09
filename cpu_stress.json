@@ -236,7 +236,8 @@
 								"https://raw.githubusercontent.com/ivanrusakov/labbox/main/deploy.cmd",
 								"https://raw.githubusercontent.com/ivanrusakov/labbox/main/cleanup.cmd",
 								"https://raw.githubusercontent.com/ivanrusakov/labbox/main/date_add.vbs",
-								"https://raw.githubusercontent.com/ivanrusakov/labbox/main/execute.ps1"
+								"https://raw.githubusercontent.com/ivanrusakov/labbox/main/execute.ps1",
+								"https://raw.githubusercontent.com/ivanrusakov/labbox/main/run_timeout.cmd"
 							]
 						}
 					}
