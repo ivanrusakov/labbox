@@ -10,10 +10,10 @@
 	},
 	"parameters": {
 		"resourcePrefix": {
-		"type": "String",
-		"defaultValue": "highcpu",
-		"metadata": {
-			"description": "Prefix for all resource names except storage."
+			"type": "String",
+			"defaultValue": "highcpu",
+			"metadata": {
+				"description": "Prefix for all resource names except storage."
 			}
 		},
 		"adminUsername": {
@@ -31,12 +31,12 @@
 			}
 		},
 		"yourHomeIP": {
-					"type": "string",
-					"defaultValue": "*",
-					"metadata": {
-						"description": "Specify your IP to allow connectivity to the VM from the NSG. Do a quick search for 'my ip' and enter your IP here. This will be placed in your NSG to allow access to the labs. If left as the default value '*', the NSG will use * for the IP address. This is not recommended as CSS policy will automatically remove this rule within a few minutes for security purposes and your LabBox will then require JIT or a new rule with your IP address specified."
-					}
-				},		
+			"type": "string",
+			"defaultValue": "*",
+			"metadata": {
+				"description": "Specify your IP to allow connectivity to the VM from the NSG. Do a quick search for 'my ip' and enter your IP here. This will be placed in your NSG to allow access to the labs. If left as the default value '*', the NSG will use * for the IP address. This is not recommended as CSS policy will automatically remove this rule within a few minutes for security purposes and your LabBox will then require JIT or a new rule with your IP address specified."
+			}
+		},
 		"location": {
 			"defaultValue": "[resourceGroup().location]",
 			"type": "String",
@@ -45,24 +45,10 @@
 			}
 		},
 		"vmSize": {
-			"defaultValue": "Standard_B2ms",
+			"defaultValue": "Standard_F4",
 			"type": "String",
 			"metadata": {
 				"description": "Default VM Size"
-			}
-		},
-		"storageUri": {
-			"defaultValue": "[format('str{0}', uniqueString(resourceGroup().id))]",
-			"type": "string",
-			"metadata": {
-				"description": "Name of storage account For Boot Diagnostics"
-			}
-		},
-		"storageAccountType": {
-			"type": "string",
-			"defaultValue": "Standard_LRS",
-			"metadata": {
-				"description": "Storage Account type"
 			}
 		}
 	},
@@ -87,7 +73,7 @@
 				"publicIPAllocationMethod": "Dynamic"
 			}
 		},
-{
+		{
 			"type": "Microsoft.Network/networkSecurityGroups",
 			"apiVersion": "2020-08-01",
 			"name": "[variables('networkSecurityGroupName')]",
@@ -180,24 +166,12 @@
 			}
 		},
 		{
-			"type": "Microsoft.Storage/storageAccounts",
-			"apiVersion": "2021-06-01",
-			"name": "[parameters('storageUri')]",
-			"location": "[parameters('location')]",
-			"sku": {
-				"name": "[parameters('storageAccountType')]"
-			},
-			"kind": "StorageV2",
-			"properties": {}
-		},
-		{
 			"type": "Microsoft.Compute/virtualMachines",
 			"apiVersion": "2020-12-01",
 			"name": "[variables('vmName')]",
 			"location": "[parameters('location')]",
 			"dependsOn": [
-				"[variables('nicName')]",
-				"[resourceId('Microsoft.Storage/storageAccounts', parameters('storageUri'))]"
+				"[variables('nicName')]"
 			],
 			"properties": {
 				"hardwareProfile": {
@@ -232,7 +206,7 @@
 				"diagnosticsProfile": {
 					"bootDiagnostics": {
 						"enabled": true,
-						"storageUri": "[concat('https://', parameters('storageUri'), '.blob.core.windows.net')]"
+						"storageUri": null
 					}
 				}
 			},
@@ -251,18 +225,19 @@
 						"typeHandlerVersion": "1.10",
 						"autoUpgradeMinorVersion": true,
 						"settings": {
-						"commandToExecute": "deploy.cmd 30 && cleanup.cmd 5 && del /q cleanup.cmd"
+							"commandToExecute":"powershell -ExecutionPolicy Unrestricted -File execute.ps1"
 						},
 						"protectedSettings": {
-						"fileUris": [
-							"https://raw.githubusercontent.com/ivanrusakov/labbox/main/cpu_stress.cmd",
-							"https://raw.githubusercontent.com/ivanrusakov/labbox/main/cpu_stress.vbs",
-							"https://raw.githubusercontent.com/ivanrusakov/labbox/main/cpu_stress.cfg",
-							"https://raw.githubusercontent.com/ivanrusakov/labbox/main/install_task.cmd",
-							"https://raw.githubusercontent.com/ivanrusakov/labbox/main/deploy.cmd",
-							"https://raw.githubusercontent.com/ivanrusakov/labbox/main/cleanup.cmd",
-							"https://raw.githubusercontent.com/ivanrusakov/labbox/main/date_add.vbs"
-						]              
+							"fileUris": [
+								"https://raw.githubusercontent.com/ivanrusakov/labbox/main/cpu_stress.cmd",
+								"https://raw.githubusercontent.com/ivanrusakov/labbox/main/cpu_stress.vbs",
+								"https://raw.githubusercontent.com/ivanrusakov/labbox/main/cpu_stress.cfg",
+								"https://raw.githubusercontent.com/ivanrusakov/labbox/main/install_task.cmd",
+								"https://raw.githubusercontent.com/ivanrusakov/labbox/main/deploy.cmd",
+								"https://raw.githubusercontent.com/ivanrusakov/labbox/main/cleanup.cmd",
+								"https://raw.githubusercontent.com/ivanrusakov/labbox/main/date_add.vbs",
+								"https://raw.githubusercontent.com/ivanrusakov/labbox/main/execute.ps1"
+							]
 						}
 					}
 				}
