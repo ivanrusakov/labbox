@@ -11,7 +11,7 @@ This project is designed to stress test the CPU of any Windows system and also c
 - **`deploy.cmd`**: Batch script to automate the deployment process.
 - **`execute.ps1`**: Staring script configured within ARM template, which deploying 
 - **`cpu_stress.json`**: Azure Resource Manager (ARM) template to deploy the VM and necessary resources.
-- **`cpu_stress.cfg`**: Configuration file listing the files to be  with `deploy.cmd`.
+- **`cpu_stress.cfg`**: Configuration file listing the files (one by line) to be installed by `install_task.cmd`.
 - **`cpu_stress.cmd`**: Batch script to start multiple instances (one per core) of the CPU stress test `cpu_stress.vbs`. `⚠️ Use with caution ⚠️`.
 - **`cpu_stress.vbs`**: VBScript to create an infinite loop, simulating CPU load, single threaded.
 - **`install_task.cmd`**: Batch script creates a scheduled task to run the stress test on VM startup.
