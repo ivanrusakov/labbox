@@ -1,5 +1,5 @@
 # CPU Stress Test Project
-**version 1.1 beta**
+**version 1.2 beta**
 
 This project is designed to stress test the CPU of any Windows system and also contains template to deploy  Azure virtual machine (VM) and deploye script automatically there. The project includes several scripts and configuration files to automate the deployment and execution of the stress test. This is exquisite vintage-ish craftwork, no modern tech involved 😉
 
@@ -76,6 +76,16 @@ The VM will run the stress test, and you can monitor its performance via the [Az
 ## Disclaimer
 This project is provided as-is without any warranty or guarantee of any kind. Use it at your own risk. The authors are not responsible for any damage or data loss that may occur as a result of using this project. Ensure you understand the implications of running a CPU stress test and deploying resources in your Azure subscription before proceeding.
 
+## License
+
+This project is licensed under the MIT License. You are free to use, modify, and distribute this project, provided that you include a reference to the original author.
+
 ## TODO
 - [ ] Make install_task usable for schedulled tasks with options to run on startup, at logon and at the specific time.
 - [x] Hide deployment output with nul in ARM template
+
+## Author and Feedback
+
+© 2023-∞ Ivan Rusakov. All rights reserved.
+
+[![Report an Issue](https://img.shields.io/github/issues-raw/ivanrusakov/labbox?style=flat-square&logo=github&color=ff69b4)](https://github.com/ivanrusakov/labbox/issues)
