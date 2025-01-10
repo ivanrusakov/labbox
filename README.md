@@ -1,7 +1,7 @@
 # CPU Stress Test Project
 **version 1.2 beta**
 
-This project is designed to stress test the CPU of any Windows system and also contains template to deploy  Azure virtual machine (VM) and deploye script automatically there. The project includes several scripts and configuration files to automate the deployment and execution of the stress test. This is exquisite vintage-ish craftwork, no modern tech involved 😉
+This project is designed to stress-test the CPU of any Windows system and includes a template for deploying an Azure virtual machine (VM) and automatically running a deployment script. The project contains several scripts and configuration files to streamline deployment and manage the stress test. This is exquisite vintage-ish craftwork, with no modern technology involved 😉
 
 ## Quick deployment
 
@@ -16,7 +16,7 @@ This project is designed to stress test the CPU of any Windows system and also c
 - **`cpu_stress.vbs`**: VBScript to create an infinite loop, simulating CPU load, single threaded.
 - **`install_task.cmd`**: Batch script creates a scheduled task to run the stress test on VM startup.
 - **`cleanup.cmd`**: Deletes all files in current folder except itself.  `⚠️ Use with caution ⚠️`.
-- **`date_add.vbs`**: Helper script calculating date in future. Can be used wtih `schtasks` to configure task to run in later.
+- **`date_add.vbs`**: Helper script calculating date in future. Can be used with `schtasks` to configure task to run in later.
 - **`run_wait.cmd`**: Helper script to run any command with timeout.
 
 ## How to Use
@@ -57,7 +57,7 @@ This project is designed to stress test the CPU of any Windows system and also c
    ```
    Execute either `deploy.cmd` or `cpu_stress.cmd` depending on your preferences.
 
-**Metod 2:** Deploy with VM from template
+**Method 2:** Deploy with VM from template
 
    Use the `cpu_stress.json` ARM template to deploy the VM and necessary resources. This can be done via the Azure portal or using Azure CLI:
    ```sh
@@ -81,7 +81,7 @@ This project is provided as-is without any warranty or guarantee of any kind. Us
 This project is licensed under the MIT License. You are free to use, modify, and distribute this project, provided that you include a reference to the original author.
 
 ## TODO
-- [ ] Make install_task usable for schedulled tasks with options to run on startup, at logon and at the specific time.
+- [ ] Make install_task usable for scheduled tasks with options to run on startup, at logon and at the specific time.
 - [x] Hide deployment output with nul in ARM template
 
 ## Author and Feedback
