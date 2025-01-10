@@ -12,9 +12,10 @@ if "%~2"=="" (
 )
 
 set wait_time=%~1
-set command_to_execute=%~2
+set "command_to_execute=%~2"
+set "command_to_execute=%command_to_execute:""="%"
 
-echo Executing command: %command_to_execute% with timeout of %wait_time% seconds...
+echo Executing command: '%command_to_execute%' with timeout of %wait_time% seconds...
 timeout /t %wait_time% /nobreak >nul
 %command_to_execute%
 
