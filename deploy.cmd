@@ -18,7 +18,7 @@ if not "%~4"=="" set "INSTALL_PATH=%~4"
 :: Start logging
 echo [%date% %time%] - Starting deployment script...
 
-rem call install_task.cmd "%TASK_NAME%" "%SCRIPT_NAME%" "%INSTALL_PATH%"
+call install_task.cmd "%TASK_NAME%" "%SCRIPT_NAME%" "%INSTALL_PATH%"
 if %errorlevel% neq 0 (
     echo %date% %time% - Error installing main task.
     endlocal
@@ -27,7 +27,7 @@ if %errorlevel% neq 0 (
 echo [%date% %time%] - Primary task installation completed.
 
 echo [%date% %time%] - Starting main task in background with delay in %INITIAL_DELAY% seconds...
-start run_wait.cmd %INITIAL_DELAY% "schtasks /run /tn "%TASK_NAME%" >nul"
+run_wait.cmd %INITIAL_DELAY% "schtasks /run /tn ""%TASK_NAME%"" >nul"
 if %errorlevel% neq 0 (
     echo %date% %time% - Error running the main task.
     endlocal
