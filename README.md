@@ -1,5 +1,5 @@
 # CPU Stress Test Project
-**version 1.2 beta**
+**version 1.3 beta**
 
 This project is designed to stress-test the CPU of any Windows system and includes a template for deploying an Azure virtual machine (VM) and automatically running a deployment script. The project contains several scripts and configuration files to streamline deployment and manage the stress test. This is exquisite vintage-ish craftwork, with no modern technology involved 😉
 
