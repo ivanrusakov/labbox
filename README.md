@@ -17,6 +17,7 @@ This project is designed to stress test the CPU of any Windows system and also c
 - **`install_task.cmd`**: Batch script creates a scheduled task to run the stress test on VM startup.
 - **`cleanup.cmd`**: Deletes all files in current folder except itself.  `⚠️ Use with caution ⚠️`.
 - **`date_add.vbs`**: Helper script calculating date in future. Can be used wtih `schtasks` to configure task to run in later.
+- **`run_wait.cmd`**: Helper script to run any command with timeout.
 
 ## How to Use
 **Metod 1:** Run manually
@@ -34,11 +35,15 @@ This project is designed to stress test the CPU of any Windows system and also c
    ``` powershell 
    # List of URLs to download
    $urls = @(
-   "https://raw.githubusercontent.com/ivanrusakov/labbox/refs/heads/main/cpu_stress.cmd",      "https://raw.githubusercontent.com/ivanrusakov/labbox/refs/heads/main/cpu_stress.vbs",      "https://raw.githubusercontent.com/ivanrusakov/labbox/refs/heads/main/cpu_stress.cfg",      "https://raw.githubusercontent.com/ivanrusakov/labbox/refs/heads/main/install_task.cmd",
-   "https://raw.githubusercontent.com/ivanrusakov/labbox/refs/heads/main/deploy.cmd",
-   "https://raw.githubusercontent.com/ivanrusakov/labbox/refs/heads/main/cleanup.cmd",
-   "https://raw.githubusercontent.com/ivanrusakov/labbox/refs/heads/main/date_add.vbs",
-   "https://raw.githubusercontent.com/ivanrusakov/labbox/main/execute.ps1"
+   "https://raw.githubusercontent.com/ivanrusakov/labbox/main/cpu_stress.cmd",
+   "https://raw.githubusercontent.com/ivanrusakov/labbox/main/cpu_stress.vbs",
+   "https://raw.githubusercontent.com/ivanrusakov/labbox/main/cpu_stress.cfg",
+   "https://raw.githubusercontent.com/ivanrusakov/labbox/main/install_task.cmd",
+   "https://raw.githubusercontent.com/ivanrusakov/labbox/main/deploy.cmd",
+   "https://raw.githubusercontent.com/ivanrusakov/labbox/main/cleanup.cmd",
+   "https://raw.githubusercontent.com/ivanrusakov/labbox/main/date_add.vbs",
+   "https://raw.githubusercontent.com/ivanrusakov/labbox/main/execute.ps1",
+   "https://raw.githubusercontent.com/ivanrusakov/labbox/main/run_wait.cmd"
    )
 
    # Download each file and overwrite if it exists
